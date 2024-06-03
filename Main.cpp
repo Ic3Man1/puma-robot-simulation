@@ -1,44 +1,41 @@
 #include "raylib.h"
 
-//------------------------------------------------------------------------------------
-// Program main entry point
-//------------------------------------------------------------------------------------
 int main(void)
 {
-    // Initialization
-    //--------------------------------------------------------------------------------------
-    const int screenWidth = 800;
-    const int screenHeight = 450;
+    const int screen_width = 1000;
+    const int screen_height = 800;
 
-    InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
+    InitWindow(screen_width, screen_height, "puma-robot");
+    SetTargetFPS(60);     
 
-    SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
-    //--------------------------------------------------------------------------------------
+    Camera3D camera = { 0 };
+    camera.position = { 10.0f, 10.0f, 10.0f }; 
+    camera.target = { 0.0f, 0.0f, 0.0f };     
+    camera.up = { 0.0f, 1.0f, 0.0f };          
+    camera.fovy = 45.0f;                      
+    camera.projection = CAMERA_PERSPECTIVE;    
 
-    // Main game loop
-    while (!WindowShouldClose())    // Detect window close button or ESC key
+    Vector3 cubePosition = { 0.0f, 0.0f, 0.0f };
+
+    while (!WindowShouldClose())    
     {
-        // Update
-        //----------------------------------------------------------------------------------
-        // TODO: Update your variables here
-        //----------------------------------------------------------------------------------
+        UpdateCamera(&camera, CAMERA_THIRD_PERSON);
 
-        // Draw
-        //----------------------------------------------------------------------------------
         BeginDrawing();
 
         ClearBackground(RAYWHITE);
+        BeginMode3D(camera);
 
-        DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
+        DrawCube(cubePosition, 2, 2, 2, RED);
+        DrawCubeWires(cubePosition, 2.0f, 2.0f, 2.0f, BLUE);
+        DrawGrid(10, 1.0f);
+
+        EndMode3D();
 
         EndDrawing();
-        //----------------------------------------------------------------------------------
     }
 
-    // De-Initialization
-    //--------------------------------------------------------------------------------------
-    CloseWindow();        // Close window and OpenGL context
-    //--------------------------------------------------------------------------------------
+    CloseWindow();       
 
     return 0;
 }
