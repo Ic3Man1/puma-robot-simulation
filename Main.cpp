@@ -12,6 +12,9 @@
 ********************************************************************************************/
 
 #include "raylib.h"
+#include "rlgl.h"
+
+#include "Robot_part.h"
 #include "GUI.h"
 
 //------------------------------------------------------------------------------------
@@ -19,12 +22,10 @@
 //------------------------------------------------------------------------------------
 int main(void)
 {
-    // Initialization
-    //--------------------------------------------------------------------------------------
+    const int screen_width = 1500;
+    const int screen_height = 800;
+    
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);    // Window configuration flags
-
-    int screenWidth = 1500;
-    int screenHeight = 800;
 
     InitWindow(screenWidth, screenHeight, "PUMA robot");
 
@@ -44,39 +45,81 @@ int main(void)
     // Set up 2D GUI
     GUI GUI(screenWidth, screenHeight);
 
+    Vector3 cubePosition1 = { 0.0f, 1.5f, 0.0f };
+    Vector3 cubePosition2 = { 0.65f, 2.75f, 0.85f };
+    Vector3 cubePosition3 = { 0.15f, 2.75f, 2.75f };
+    Vector3 cubePosition4 = { 0.15f, 2.75f, 4.15f };
+
+    Robot_part part1 = Robot_part(1, cubePosition1, 0.8f, 3.0f, 0.8f, GRAY);
+    Robot_part part2 = Robot_part(2, cubePosition2, 0.5f, 0.5f, 2.5f, GRAY);
+    Robot_part part3 = Robot_part(3, cubePosition3, 0.5f, 0.5f, 2.5f, GRAY);
+    Robot_part part4 = Robot_part(4, cubePosition4, 0.3f, 0.3f, 0.3f, DARKGRAY);
+
     SetTargetFPS(60);                   // Set our game to run at 60 frames-per-second
-    //--------------------------------------------------------------------------------------
 
     // Main game loop
     while (!WindowShouldClose())        // Detect window close button or ESC key
     {
-        // Update
-        //----------------------------------------------------------------------------------
         UpdateCamera(&camera, CAMERA_THIRD_PERSON);
 
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
             GUI.CheckIfButtonPressed();
         }
-        //----------------------------------------------------------------------------------
-
-        // Draw 3D
-        //----------------------------------------------------------------------------------
 
         BeginDrawing();
 
         ClearBackground(RAYWHITE);
+      
+        // Draw 3D
+      
         BeginMode3D(camera);
+        
+        rlPushMatrix();
+        
+        if (IsKeyDown(KEY_ONE))
+        {
+            part1.rotate("+");
+        }
+        else if (IsKeyDown(KEY_TWO))
+        {
+            part1.rotate("-");
+        }   
 
-        DrawCube(cubePosition, 2, 2, 2, RED);
-        DrawCubeWires(cubePosition, 2.0f, 2.0f, 2.0f, BLUE);
+        if (IsKeyDown(KEY_THREE))
+        {
+            part2.rotate("+");
+        }
+        else if (IsKeyDown(KEY_FOUR))
+        {
+            part2.rotate("-");
+        }
+
+        if (IsKeyDown(KEY_FIVE))
+        {
+            part3.rotate("+");
+        }
+        else if (IsKeyDown(KEY_SIX))
+        {
+            part3.rotate("-");
+        }
+
+        part1.draw();
+        part1.draw_wire(BLUE);
+        part2.draw();
+        part2.draw_wire(RED);
+        part3.draw();
+        part3.draw_wire(GREEN);
+        part4.draw();
+        part4.draw_wire(PURPLE);
+        
+        rlPopMatrix();
         DrawGrid(10, 1.0f);
 
         EndMode3D();
-
+        
         // Draw 2D
-        //----------------------------------------------------------------------------------
-
+      
         GUI.DrawGUI(screenWidth, screenHeight);
 
         EndDrawing();
