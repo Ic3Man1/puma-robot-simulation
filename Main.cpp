@@ -12,7 +12,6 @@
 ********************************************************************************************/
 
 #include "raylib.h"
-
 #include "GUI.h"
 
 //------------------------------------------------------------------------------------
@@ -27,7 +26,7 @@ int main(void)
     int screenWidth = 1500;
     int screenHeight = 800;
 
-    InitWindow(screenWidth, screenHeight, "Window title");
+    InitWindow(screenWidth, screenHeight, "PUMA robot");
 
     // Define the camera to look into our 3d world
     Camera camera = { 0 };
@@ -38,7 +37,6 @@ int main(void)
     camera.projection = CAMERA_PERSPECTIVE;             // Camera projection type
 
     Vector3 cubePosition = { 0.0f, 1.0f, 0.0f };
-    Vector3 cubeSize = { 2.0f, 2.0f, 2.0f };
 
     Ray ray = { 0 };                    // Picking line ray
     RayCollision collision = { 0 };     // Ray collision hit info
@@ -54,59 +52,24 @@ int main(void)
     {
         // Update
         //----------------------------------------------------------------------------------
-        if (IsCursorHidden()) UpdateCamera(&camera, CAMERA_FIRST_PERSON);
-
-        // Toggle camera controls
-        if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
-        {
-            if (IsCursorHidden()) EnableCursor();
-            else DisableCursor();
-        }
+        UpdateCamera(&camera, CAMERA_THIRD_PERSON);
 
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
-            if (!collision.hit)
-            {
-                ray = GetMouseRay(GetMousePosition(), camera);
-
-                // Check collision between ray and box
-                collision = GetRayCollisionBox(ray,{
-                    {
-                        cubePosition.x - cubeSize.x / 2, cubePosition.y - cubeSize.y / 2, cubePosition.z - cubeSize.z / 2
-                    },
-                    {
-                        cubePosition.x + cubeSize.x / 2, cubePosition.y + cubeSize.y / 2, cubePosition.z + cubeSize.z / 2
-                    }
-                });
-            }
-            else collision.hit = false;
-
             GUI.CheckIfButtonPressed();
         }
         //----------------------------------------------------------------------------------
 
         // Draw 3D
         //----------------------------------------------------------------------------------
+
         BeginDrawing();
 
         ClearBackground(RAYWHITE);
-
         BeginMode3D(camera);
 
-        if (collision.hit)
-        {
-            DrawCube(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, RED);
-            DrawCubeWires(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, MAROON);
-
-            DrawCubeWires(cubePosition, cubeSize.x + 0.2f, cubeSize.y + 0.2f, cubeSize.z + 0.2f, GREEN);
-        }
-        else
-        {
-            DrawCube(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, GRAY);
-            DrawCubeWires(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, DARKGRAY);
-        }
-
-        DrawRay(ray, MAROON);
+        DrawCube(cubePosition, 2, 2, 2, RED);
+        DrawCubeWires(cubePosition, 2.0f, 2.0f, 2.0f, BLUE);
         DrawGrid(10, 1.0f);
 
         EndMode3D();
@@ -117,13 +80,9 @@ int main(void)
         GUI.DrawGUI(screenWidth, screenHeight);
 
         EndDrawing();
-        //----------------------------------------------------------------------------------
     }
 
-    // De-Initialization
-    //--------------------------------------------------------------------------------------
-    CloseWindow();        // Close window and OpenGL context
-    //--------------------------------------------------------------------------------------
+    CloseWindow();       
 
     return 0;
 }
