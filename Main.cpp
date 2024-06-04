@@ -2,11 +2,9 @@
 #include "Robot_part.h"
 #include "rlgl.h"
 
-
-
 int main(void)
 {
-    const int screen_width = 1000;
+    const int screen_width = 1500;
     const int screen_height = 800;
 
     InitWindow(screen_width, screen_height, "puma-robot");
@@ -19,15 +17,13 @@ int main(void)
     camera.fovy = 45.0f;                      
     camera.projection = CAMERA_PERSPECTIVE;    
 
-    Vector3 cubePosition1 = { 0.0f, 1.0f, 0.0f };
-    Vector3 cubePosition2 = { 0.0f, 2.25f, -0.25f };
-    Vector3 cubePosition3 = { 0.5f, 2.25f, -1.0f };
-    Vector3 cubePosition4 = { 1.25f, 1.75f, -0.5f };
+    Vector3 cubePosition1 = { 0.0f, 1.5f, 0.0f };
+    Vector3 cubePosition2 = { 0.65f, 2.75f, 0.85f };
+    Vector3 cubePosition3 = { 0.15f, 2.75f, 2.75f };
 
-    Robot_part part1 = Robot_part(0, cubePosition1, 0.5f, 2.0f, 0.5f, GRAY);
-    Robot_part part2 = Robot_part(1, cubePosition2, 0.5f, 0.5f, 1.0f, GRAY);
-    Robot_part part3 = Robot_part(2, cubePosition3, 2.0f, 0.5f, 0.5f, GRAY);
-    Robot_part part4 = Robot_part(3, cubePosition4, 0.5f, 1.5f, 0.5f, GRAY);
+    Robot_part part1 = Robot_part(1, cubePosition1, 0.8f, 3.0f, 0.8f, GRAY);
+    Robot_part part2 = Robot_part(2, cubePosition2, 0.5f, 0.5f, 2.5f, GRAY);
+    Robot_part part3 = Robot_part(3, cubePosition3, 0.5f, 0.5f, 2.5f, GRAY);
     int i = 0;
 
     while (!WindowShouldClose())    
@@ -47,45 +43,54 @@ int main(void)
         rlPopMatrix();
         i++;
         */
+        
         rlPushMatrix();
         
-       
+        /*
         part1.draw();
         part1.draw_wire(BLUE);
+        part2.draw();
+        part2.draw_wire(BLUE);
+        part3.draw();
+        part3.draw_wire(BLUE);
+        */
+        
         if (IsKeyDown(KEY_ONE))
         {
-            part2.rotate("+");
+            part1.rotate("+");
         }
         else if (IsKeyDown(KEY_TWO))
         {
-            part2.rotate("-");
-        }
-        part2.draw();
-        part2.draw_wire(RED);
+            part1.rotate("-");
+        }   
+
         if (IsKeyDown(KEY_THREE))
         {
-            part3.rotate("+");
+            part2.rotate("+");
         }
         else if (IsKeyDown(KEY_FOUR))
         {
-            part3.rotate("-");
+            part2.rotate("-");
         }
-        part3.draw();
-        part3.draw_wire(GREEN);
+
         if (IsKeyDown(KEY_FIVE))
         {
-            part4.rotate("+");
+            part3.rotate("+");
         }
         else if (IsKeyDown(KEY_SIX))
         {
-            part4.rotate("-");
+            part3.rotate("-");
         }
-        part4.draw();
-        part4.draw_wire(ORANGE);
+
+        part1.draw();
+        part1.draw_wire(BLUE);
+        part2.draw();
+        part2.draw_wire(RED);
+        part3.draw();
+        part3.draw_wire(GREEN);
         
         rlPopMatrix();
         DrawGrid(10, 1.0f);
-
 
         EndMode3D();
 

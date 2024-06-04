@@ -65,9 +65,20 @@ void Robot_part::rotate(string side)
 
 void Robot_part::draw()
 {
+	// rotating cube 1
 	rlRotatef(rot_pos_1, 0, 1, 0);
-	rlRotatef(rot_pos_2, 0, 0, 1);
-	rlRotatef(rot_pos_3, 0, 0, 1);
+
+	// rotating cube 2
+	rlTranslatef(0.0f, 2.75f, 0.0f);
+	rlRotatef(rot_pos_2, 1, 0, 0);
+
+	// rotating cube 3
+	rlTranslatef(0.0f, 0.0f, 1.85f);
+	rlRotatef(rot_pos_3, 1, 0, 0);
+
+	// reseting centre of origin
+	rlTranslatef(0.0f, -2.75f, -1.85f);
+
 	DrawCube(cube_position, width, height, length, color);
 }
 
