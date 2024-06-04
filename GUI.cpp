@@ -1,8 +1,9 @@
 #include "GUI.h"
+#include "Robot_part.h"
 
 GUI::GUI(int screenWidth, int screenHeight) {
 	guiRectangle = { 0, (float)(screenHeight - screenHeight * 0.3), (float)(screenWidth), (float)(screenHeight * 0.3) };
-    acceptRectangle = { 10, (float)(screenHeight - screenHeight * 0.3 + 140),  (float)(screenWidth / 6), (float)(screenHeight * 0.1) };
+    acceptRectangle = { 10, (float)(screenHeight - screenHeight * 0.3 + 130),  (float)(screenWidth / 6), (float)(screenHeight * 0.1) };
     startRectangle = { (float)(screenWidth / 5), (float)(screenHeight - screenHeight * 0.3 + 30),  (float)(screenWidth / 5), (float)(screenHeight * 0.1)};
     finishRectangle = { (float)(screenWidth / 5), (float)(screenHeight - screenHeight * 0.3 + 130),  (float)(screenWidth / 5), (float)(screenHeight * 0.1) };
     executeRectangle = { (float)(screenWidth / 2 - 120), (float)(screenHeight - screenHeight * 0.3 + 30),  (float)(screenWidth / 5 - 30), (float)(screenHeight * 0.1 + 100) };
@@ -12,18 +13,18 @@ GUI::GUI(int screenWidth, int screenHeight) {
     buttonColor = DARKGRAY;
 }
 
-void GUI::DrawGUI(int screenWidth, int screenHeight) {
+void GUI::DrawGUI(int screenWidth, int screenHeight, Vector3 cords) {
     DrawRectangleRec(guiRectangle, guiColor);
 
     const unsigned int fontSize = 25;
 
     DrawText("x: ", 20, screenHeight - screenHeight * 0.3 + 30, fontSize, BLACK);
-    DrawText("y: ", 20, screenHeight - screenHeight * 0.3 + 70, fontSize, BLACK);
-    DrawText("z: ", 20, screenHeight - screenHeight * 0.3 + 110, fontSize, BLACK);
+    DrawText("y: ", 20, screenHeight - screenHeight * 0.3 + 60, fontSize, BLACK);
+    DrawText("z: ", 20, screenHeight - screenHeight * 0.3 + 100, fontSize, BLACK);
 
     // drawing the accept button
     DrawRectangleRec(acceptRectangle, buttonColor);
-    DrawText("ACCEPT", 30, screenHeight - screenHeight * 0.3 + 160, fontSize * 1.5, BLACK);
+    DrawText("ACCEPT", 30, screenHeight - screenHeight * 0.3 + 150, fontSize * 1.5, BLACK);
 
     // drawing the start learning button
     DrawRectangleRec(startRectangle, buttonColor);
@@ -49,16 +50,16 @@ void GUI::DrawGUI(int screenWidth, int screenHeight) {
     // drawing manipulator coordinates text
     DrawText("Manipulator", screenWidth / 5 * 4 + 80, screenHeight - screenHeight * 0.3 + 30, fontSize, BLACK);
     DrawText("coordinates:", screenWidth / 5 * 4 + 80, screenHeight - screenHeight * 0.3 + 70, fontSize, BLACK);
-    DrawText("X: ", screenWidth / 5 * 4 + 80, screenHeight - screenHeight * 0.3 + 110, fontSize, BLACK);
-    DrawText("Y: ", screenWidth / 5 * 4 + 80, screenHeight - screenHeight * 0.3 + 150, fontSize, BLACK);
-    DrawText("Z: ", screenWidth / 5 * 4 + 80, screenHeight - screenHeight * 0.3 + 180, fontSize, BLACK);
+    DrawText(TextFormat("X: %.2f", cords.x), screenWidth / 5 * 4 + 80, screenHeight - screenHeight * 0.3 + 110, fontSize, BLACK);
+    DrawText(TextFormat("Y: %.2f", cords.z), screenWidth / 5 * 4 + 80, screenHeight - screenHeight * 0.3 + 150, fontSize, BLACK);
+    DrawText(TextFormat("Z: %.2f", cords.y), screenWidth / 5 * 4 + 80, screenHeight - screenHeight * 0.3 + 180, fontSize, BLACK);
 }
 
 void GUI::CheckIfButtonPressed() {
     // checking if accept button was pressed
     if (CheckCollisionPointRec(GetMousePosition(), acceptRectangle)) {
         // accept button callback function
-
+   
     }
     if (CheckCollisionPointRec(GetMousePosition(), startRectangle)) {
         // start learning button callback function

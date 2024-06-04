@@ -1,21 +1,12 @@
-/*******************************************************************************************
-*
-*   raylib [core] example - Picking in 3d mode
-*
-*   Example originally created with raylib 1.3, last time updated with raylib 4.0
-*
-*   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
-*   BSD-like license that allows static linking with closed source software
-*
-*   Copyright (c) 2015-2024 Ramon Santamaria (@raysan5)
-*
-********************************************************************************************/
-
 #include "raylib.h"
 #include "rlgl.h"
+#include <iostream>
+#include "raymath.h"
 
 #include "Robot_part.h"
 #include "GUI.h"
+
+BoundingBox create_bounding_box(Vector3 position, Vector3 size);
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -27,7 +18,7 @@ int main(void)
     
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);    // Window configuration flags
 
-    InitWindow(screenWidth, screenHeight, "PUMA robot");
+    InitWindow(screen_width, screen_height, "PUMA robot");
 
     // Define the camera to look into our 3d world
     Camera camera = { 0 };
@@ -43,12 +34,17 @@ int main(void)
     RayCollision collision = { 0 };     // Ray collision hit info
 
     // Set up 2D GUI
-    GUI GUI(screenWidth, screenHeight);
+    GUI GUI(screen_width, screen_height);
 
     Vector3 cubePosition1 = { 0.0f, 1.5f, 0.0f };
     Vector3 cubePosition2 = { 0.65f, 2.75f, 0.85f };
     Vector3 cubePosition3 = { 0.15f, 2.75f, 2.75f };
     Vector3 cubePosition4 = { 0.15f, 2.75f, 4.15f };
+
+    Vector3 cubeSize1 = { 0.8f, 3.0f, 0.8f };
+    Vector3 cubeSize2 = { 0.5f, 0.5f, 2.5f };
+    Vector3 cubeSize3 = { 0.5f, 0.5f, 2.5f };
+    Vector3 cubeSize4 = { 0.3f, 0.3f, 0.3f };
 
     Robot_part part1 = Robot_part(1, cubePosition1, 0.8f, 3.0f, 0.8f, GRAY);
     Robot_part part2 = Robot_part(2, cubePosition2, 0.5f, 0.5f, 2.5f, GRAY);
@@ -60,49 +56,62 @@ int main(void)
     // Main game loop
     while (!WindowShouldClose())        // Detect window close button or ESC key
     {
+        float x = DEG2RAD * (part1.rot_pos_1), y = DEG2RAD * (part2.rot_pos_2), z = DEG2RAD * (part3.rot_pos_3);
+        Vector3 current_manipulator_cords = { 1.85 * sin(x) * cos(y) - 2.55 * sin(x) * sin(y) * sin(z) + 2.55 * sin(x) * cos(y) * cos(z),
+                                2.75 + 1.85 * sin(y) + 2.55 * sin(y) * cos(z) + 2.55 * cos(y) * sin(z),
+                                1.85 * cos(x) * cos(y) + 2.55 * cos(x) * cos(y) * cos(z) - 2.55 * cos(x) * sin(y) * sin(z) };
+        current_manipulator_cords.y = 5.5 - current_manipulator_cords.y;
+        //cout << current_manipulator_cords.x << "; " << current_manipulator_cords.y << "; " << current_manipulator_cords.z << "      ";
+        //cout << part1.rot_pos_1 << "  " << part2.rot_pos_2 << "  " << part3.rot_pos_3 << "     " << endl;
+
+        //1.85 * sin(x) * cos(y) - 2.45 * sin(x) * sin(y) * sin(z) + 2.45 * sin(x) * cos(y) * cos(z); //x
+        //1.85 * cos(x) * cos(y) + 2.45 * cos(x) * cos(y) * cos(z) - 2.45 * cos(x) * sin(y) * sin(z); //y
+        //2.75 + 1.85 * sin(y) + 2.45 * sin(y) * cos(z) + 2.45 * cos(y) * sin(z); // z
+        
         UpdateCamera(&camera, CAMERA_THIRD_PERSON);
 
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
             GUI.CheckIfButtonPressed();
         }
-
+        
         BeginDrawing();
 
         ClearBackground(RAYWHITE);
-      
-        // Draw 3D
-      
-        BeginMode3D(camera);
         
+        // Draw 3d
+        BeginMode3D(camera);
+
         rlPushMatrix();
+        
         
         if (IsKeyDown(KEY_ONE))
         {
-            part1.rotate("+");
+            part1.rotate("+", current_manipulator_cords);
         }
         else if (IsKeyDown(KEY_TWO))
         {
-            part1.rotate("-");
-        }   
+            part1.rotate("-", current_manipulator_cords);
+        }
 
         if (IsKeyDown(KEY_THREE))
         {
-            part2.rotate("+");
+            part2.rotate("+", current_manipulator_cords);
         }
         else if (IsKeyDown(KEY_FOUR))
         {
-            part2.rotate("-");
+            part2.rotate("-", current_manipulator_cords);
         }
 
         if (IsKeyDown(KEY_FIVE))
         {
-            part3.rotate("+");
+            part3.rotate("+", current_manipulator_cords);
         }
         else if (IsKeyDown(KEY_SIX))
         {
-            part3.rotate("-");
+            part3.rotate("-", current_manipulator_cords);
         }
+     
 
         part1.draw();
         part1.draw_wire(BLUE);
@@ -120,7 +129,7 @@ int main(void)
         
         // Draw 2D
       
-        GUI.DrawGUI(screenWidth, screenHeight);
+        GUI.DrawGUI(screen_width, screen_height, current_manipulator_cords);
 
         EndDrawing();
     }
@@ -128,4 +137,11 @@ int main(void)
     CloseWindow();       
 
     return 0;
+}
+
+BoundingBox create_bounding_box(Vector3 position, Vector3 size) 
+{
+    Vector3 min = { position.x - size.x / 2, position.y - size.y / 2, position.z - size.z / 2 };
+    Vector3 max = { position.x + size.x / 2, position.y + size.y / 2, position.z + size.z / 2 };
+    return {min, max};
 }
