@@ -20,10 +20,12 @@ int main(void)
     Vector3 cubePosition1 = { 0.0f, 1.5f, 0.0f };
     Vector3 cubePosition2 = { 0.65f, 2.75f, 0.85f };
     Vector3 cubePosition3 = { 0.15f, 2.75f, 2.75f };
+    Vector3 cubePosition4 = { 0.15f, 2.75f, 4.15f };
 
     Robot_part part1 = Robot_part(1, cubePosition1, 0.8f, 3.0f, 0.8f, GRAY);
     Robot_part part2 = Robot_part(2, cubePosition2, 0.5f, 0.5f, 2.5f, GRAY);
     Robot_part part3 = Robot_part(3, cubePosition3, 0.5f, 0.5f, 2.5f, GRAY);
+    Robot_part part4 = Robot_part(4, cubePosition4, 0.3f, 0.3f, 0.3f, DARKGRAY);
     int i = 0;
 
     while (!WindowShouldClose())    
@@ -88,6 +90,8 @@ int main(void)
         part2.draw_wire(RED);
         part3.draw();
         part3.draw_wire(GREEN);
+        part4.draw();
+        part4.draw_wire(PURPLE);
         
         rlPopMatrix();
         DrawGrid(10, 1.0f);
