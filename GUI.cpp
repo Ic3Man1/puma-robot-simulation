@@ -55,8 +55,8 @@ void GUI::DrawGUI(int screenWidth, int screenHeight, Vector3 cords) {
 
     // drawing button info text
     DrawText("Button 1/2 - Axis 1", screenWidth / 5 * 3 + 50, screenHeight - screenHeight * 0.3 + 100, fontSize, BLACK);
-    DrawText("Button 1/2 - Axis 1", screenWidth / 5 * 3 + 50, screenHeight - screenHeight * 0.3 + 140, fontSize, BLACK);
-    DrawText("Button 1/2 - Axis 1", screenWidth / 5 * 3 + 50, screenHeight - screenHeight * 0.3 + 180, fontSize, BLACK);
+    DrawText("Button 1/2 - Axis 2", screenWidth / 5 * 3 + 50, screenHeight - screenHeight * 0.3 + 140, fontSize, BLACK);
+    DrawText("Button 1/2 - Axis 3", screenWidth / 5 * 3 + 50, screenHeight - screenHeight * 0.3 + 180, fontSize, BLACK);
 
     // drawing manipulator coordinates text
     DrawText("Manipulator", screenWidth / 5 * 4 + 80, screenHeight - screenHeight * 0.3 + 30, fontSize, BLACK);
@@ -66,34 +66,42 @@ void GUI::DrawGUI(int screenWidth, int screenHeight, Vector3 cords) {
     DrawText(TextFormat("Z: %.2f", cords.y), screenWidth / 5 * 4 + 80, screenHeight - screenHeight * 0.3 + 180, fontSize, BLACK);
 }
 
-void GUI::CheckIfButtonPressed() {
-    // checking if accept button was pressed
-    if (CheckCollisionPointRec(GetMousePosition(), acceptRectangle)) {
-        // accept button callback function
-   
+int GUI::CheckIfButtonPressed() {
+    // 1 - inverse kinematics
+    // 2 - nauka
+    // 3 - koniec nauki
+    // 4 - odtworz nauczony program
+    // 5 - manual mode (domyslny)
+        
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    {
+        // checking if accept button was pressed
+        if (CheckCollisionPointRec(GetMousePosition(), acceptRectangle)) {
+            // accept button callback function
+            mode = 1;
+        }
+        if (CheckCollisionPointRec(GetMousePosition(), startRectangle)) {
+            // start learning button callback function
+            mode = 2;
+        }
+        if (CheckCollisionPointRec(GetMousePosition(), finishRectangle)) {
+            // finish learing button callback function
+            mode = 3;
+        }
+        if (CheckCollisionPointRec(GetMousePosition(), executeRectangle)) {
+            // execute button callback function
+            mode = 4;
+        }
+        if (CheckCollisionPointRec(GetMousePosition(), manualRectangle)) {
+            // manual mode button callback function
+            mode = 5;
+        }
     }
-    if (CheckCollisionPointRec(GetMousePosition(), startRectangle)) {
-        // start learning button callback function
-
-    }
-    if (CheckCollisionPointRec(GetMousePosition(), finishRectangle)) {
-        // finish learing button callback function
-
-    }
-    if (CheckCollisionPointRec(GetMousePosition(), executeRectangle)) {
-        // execute button callback function
-
-    }
-    if (CheckCollisionPointRec(GetMousePosition(), manualRectangle)) {
-        // manual mode button callback function
-
-    }
+    return mode;
 }
 
 void GUI::CheckIfMouseOnButton(bool &writing)
 {   
-    //const int MAX_INPUT = 2;
-    static int letter_count_x = 0, letter_count_y = 0, letter_count_z=0;
     if (CheckCollisionPointRec(GetMousePosition(), xRectangle)) {
         writing = true;
         DrawRectangleLines(xRectangle.x, xRectangle.y, xRectangle.width, xRectangle.height, BLUE);
@@ -102,8 +110,8 @@ void GUI::CheckIfMouseOnButton(bool &writing)
         SetMouseCursor(MOUSE_CURSOR_IBEAM);
         while (key_x > 0)
         {
-            // NOTE: Only allow keys in range [32..125]
-            if ((key_x >= 48) && (key_x <= 57) && (letter_count_x < 2))
+            // NOTE: Only allow numbers
+            if ((((key_x >= 48) and (key_x <= 57)) or key_x == 46 or key_x == 45) and (letter_count_x < 5))
             {
                 x_input[letter_count_x] = (char)key_x;
                 x_input[letter_count_x + 1] = '\0';
@@ -128,8 +136,8 @@ void GUI::CheckIfMouseOnButton(bool &writing)
         SetMouseCursor(MOUSE_CURSOR_IBEAM);
         while (key_y > 0)
         {
-            // NOTE: Only allow keys in range [32..125]
-            if ((key_y >= 48) && (key_y <= 57) && (letter_count_y < 2))
+            // NOTE: Only allow numbers
+            if ((((key_y >= 48) and (key_y <= 57)) or key_y == 46 or key_y == 45) and (letter_count_y < 5))
             {
                 y_input[letter_count_y] = (char)key_y;
                 y_input[letter_count_y + 1] = '\0';
@@ -154,11 +162,11 @@ void GUI::CheckIfMouseOnButton(bool &writing)
         SetMouseCursor(MOUSE_CURSOR_IBEAM);
         while (key_z > 0)
         {
-            // NOTE: Only allow keys in range [32..125]
-            if ((key_z >= 48) && (key_z <= 57) && (letter_count_z < 2))
+            // NOTE: Only allow numbers
+            if ((((key_z >= 48) and (key_z <= 57)) or key_z == 46 or key_z == 45) and (letter_count_z < 5))
             {
                 z_input[letter_count_z] = (char)key_z;
-                z_input[letter_count_x + 1] = '\0';
+                z_input[letter_count_z + 1] = '\0';
                 letter_count_z++;
             }
 
@@ -177,4 +185,22 @@ void GUI::CheckIfMouseOnButton(bool &writing)
         writing = false;
         SetMouseCursor(MOUSE_CURSOR_DEFAULT);
     }
+}
+
+Vector3 GUI::ReturnFinalCoordinates()
+{
+    float x, y, z;
+    x = atof(x_input);
+    y = atof(y_input);
+    z = atof(z_input);
+    for (int i = 0; i <= 5; i++)
+    {
+        x_input[i] = '\0';
+        y_input[i] = '\0';
+        z_input[i] = '\0';
+    }
+    letter_count_x = 0;
+    letter_count_y = 0;
+    letter_count_z = 0;
+    return {x,y,z};
 }

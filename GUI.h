@@ -9,13 +9,16 @@ class GUI {
 	public:
 		GUI(int screenWidth, int screenHeight);
 		void DrawGUI(int screenWidth, int screenHeight, Vector3 cords);
-		void CheckIfButtonPressed();
-		void CheckIfMouseOnButton(bool &writing);
+		int CheckIfButtonPressed();
+		void CheckIfMouseOnButton(bool& writing);
+		Vector3 ReturnFinalCoordinates();
+		int letter_count_x = 0, letter_count_y = 0, letter_count_z = 0;
+		int mode = 5;
 
 	private:
 		Rectangle guiRectangle, acceptRectangle, startRectangle, finishRectangle, executeRectangle, manualRectangle, xRectangle, yRectangle, zRectangle;
 		Color guiColor, buttonColor;
-		char x_input[3] = "\0", y_input[3] = "\0", z_input[3] = "\0";
+		char x_input[6] = "\0", y_input[6] = "\0", z_input[6] = "\0";
 };
 
 #endif // GUI_CLASS_H

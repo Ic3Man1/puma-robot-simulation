@@ -72,13 +72,8 @@ int main(void)
         //c = 2.75 + 1.85 * sin(y) + 2.45 * sin(y) * cos(z) + 2.45 * cos(y) * sin(z); // z
         
         UpdateCamera(&camera, CAMERA_THIRD_PERSON);
-
-        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-        {
-            GUI.CheckIfButtonPressed();
-        }
-        
-        
+        int mode = GUI.CheckIfButtonPressed();
+        //cout << mode << endl;
         BeginDrawing();
         
         ClearBackground(RAYWHITE);
@@ -90,36 +85,89 @@ int main(void)
         DrawSphere({ 0, 0, 3 }, 0.5f, RED);
         DrawSphere({ 0, 0, -3 }, 0.5f, BLUE);
         rlPushMatrix();
-        if (!writing)
+        if (mode == 5)
         {
-            if (IsKeyDown(KEY_ONE))
+            if (!writing)
             {
-                part1.rotate("+", current_manipulator_cords);
-            }
-            else if (IsKeyDown(KEY_TWO))
-            {
-                part1.rotate("-", current_manipulator_cords);
-            }
+                if (IsKeyDown(KEY_ONE))
+                {
+                    part1.rotate("+", current_manipulator_cords);
+                }
+                else if (IsKeyDown(KEY_TWO))
+                {
+                    part1.rotate("-", current_manipulator_cords);
+                }
 
-            if (IsKeyDown(KEY_THREE))
-            {
-                part2.rotate("+", current_manipulator_cords);
-            }
-            else if (IsKeyDown(KEY_FOUR))
-            {
-                part2.rotate("-", current_manipulator_cords);
-            }
+                if (IsKeyDown(KEY_THREE))
+                {
+                    part2.rotate("+", current_manipulator_cords);
+                }
+                else if (IsKeyDown(KEY_FOUR))
+                {
+                    part2.rotate("-", current_manipulator_cords);
+                }
 
-            if (IsKeyDown(KEY_FIVE))
-            {
-                part3.rotate("+", current_manipulator_cords);
-            }
-            else if (IsKeyDown(KEY_SIX))
-            {
-                part3.rotate("-", current_manipulator_cords);
+                if (IsKeyDown(KEY_FIVE))
+                {
+                    part3.rotate("+", current_manipulator_cords);
+                }
+                else if (IsKeyDown(KEY_SIX))
+                {
+                    part3.rotate("-", current_manipulator_cords);
+                }
             }
         }
-     
+       
+        if (mode == 1)
+        {
+            static double alpha = 0, beta = 0, gamma = 0;
+            static bool moving = false;
+            static Vector3 final_coord = { 0,0,0 };
+            if (moving == false)
+            {
+                final_coord = GUI.ReturnFinalCoordinates();
+                znajdz_katy(final_coord.x, final_coord.z, final_coord.y, alpha, beta, gamma);
+                alpha = int(alpha * 180 / PI);
+                beta = int(beta * 180 / PI);
+                gamma = int(gamma * 180 / PI);
+                cout << "Koordynaty koncowe: " << final_coord.x << "  " << final_coord.y << "  " << final_coord.z << endl;
+                cout << "Katy koncowe: " << alpha << "  " << beta << "  " << gamma << endl;
+                moving = true;
+            }
+            cout << "Katy koncowe: " << alpha << "  " << beta << "  " << gamma << endl;
+            if (moving == true)
+            {
+                if (part1.rot_pos_1 > alpha)
+                {
+                    part1.rotate("-", current_manipulator_cords);
+                }
+                else if (part1.rot_pos_1 < alpha)
+                {
+                    part1.rotate("+", current_manipulator_cords);
+                }
+                if (part2.rot_pos_2 > beta)
+                {
+                    part2.rotate("-", current_manipulator_cords);
+                }
+                else if (part2.rot_pos_2 < beta)
+                {
+                    part2.rotate("+", current_manipulator_cords);
+                }
+                if (part3.rot_pos_3 > gamma)
+                {
+                    part3.rotate("-", current_manipulator_cords);
+                }
+                else if (part3.rot_pos_3 < gamma)
+                {
+                    part3.rotate("+", current_manipulator_cords);
+                }
+            }
+            if (part1.rot_pos_1 == alpha and part2.rot_pos_2 == beta and part3.rot_pos_3 == gamma)
+            {
+                GUI.mode = 5;
+                moving = false;
+            }
+        }
 
         part1.draw();
         part1.draw_wire(BLUE);
