@@ -25,6 +25,7 @@ void GUI::DrawGUI(int screenWidth, int screenHeight, Vector3 cords) {
     DrawText("x: ", 20, screenHeight - screenHeight * 0.3 + 30, fontSize, BLACK);
     DrawText("y: ", 20, screenHeight - screenHeight * 0.3 + 60, fontSize, BLACK);
     DrawText("z: ", 20, screenHeight - screenHeight * 0.3 + 100, fontSize, BLACK);
+
     //Drawing coordinates that will be set for robot to reach
     DrawRectangleRec(xRectangle, LIGHTGRAY);
     DrawText(x_input, xRectangle.x+3, xRectangle.y + 3, 20, BLACK);
@@ -66,14 +67,15 @@ void GUI::DrawGUI(int screenWidth, int screenHeight, Vector3 cords) {
     DrawText(TextFormat("Z: %.2f", cords.y), screenWidth / 5 * 4 + 80, screenHeight - screenHeight * 0.3 + 180, fontSize, BLACK);
 }
 
-int GUI::CheckIfButtonPressed() {
+int GUI::CheckIfButtonPressed() { // modes 
+    //pressing one button activates the mode assigned to him, functions returns information to main which mode it wants to use now
     // 1 - inverse kinematics
-    // 2 - nauka
-    // 3 - koniec nauki
-    // 4 - odtworz nauczony program
-    // 5 - manual mode (domyslny)
+    // 2 - start learning
+    // 3 - finish learning
+    // 4 - execute learnt sequence
+    // 5 - manual mode (default)
         
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) 
     {
         // checking if accept button was pressed
         if (CheckCollisionPointRec(GetMousePosition(), acceptRectangle)) {
@@ -102,7 +104,7 @@ int GUI::CheckIfButtonPressed() {
 
 void GUI::CheckIfMouseOnButton(bool &writing)
 {   
-    if (CheckCollisionPointRec(GetMousePosition(), xRectangle)) {
+    if (CheckCollisionPointRec(GetMousePosition(), xRectangle)) { // saves and displays input written by user
         writing = true;
         DrawRectangleLines(xRectangle.x, xRectangle.y, xRectangle.width, xRectangle.height, BLUE);
         //cout << "on x" << endl;
@@ -187,7 +189,7 @@ void GUI::CheckIfMouseOnButton(bool &writing)
     }
 }
 
-Vector3 GUI::ReturnFinalCoordinates()
+Vector3 GUI::ReturnFinalCoordinates() // converts input given by user into float and sends it to program to know where it wants to go
 {
     float x, y, z;
     x = atof(x_input);

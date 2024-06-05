@@ -85,7 +85,7 @@ int main(void)
         DrawSphere({ 0, 0, 3 }, 0.5f, RED);
         DrawSphere({ 0, 0, -3 }, 0.5f, BLUE);
         rlPushMatrix();
-        if (mode == 5)
+        if (mode == 5) //manual mode 
         {
             if (!writing)
             {
@@ -118,20 +118,20 @@ int main(void)
             }
         }
        
-        if (mode == 1)
+        if (mode == 1) // input coordinates mode
         {
             static double alpha = 0, beta = 0, gamma = 0;
             static bool moving = false;
             static Vector3 final_coord = { 0,0,0 };
             if (moving == false)
             {
-                final_coord = GUI.ReturnFinalCoordinates();
-                znajdz_katy(final_coord.x, final_coord.z, final_coord.y, alpha, beta, gamma);
-                alpha = int(alpha * 180 / PI);
+                final_coord = GUI.ReturnFinalCoordinates(); //geting destination
+                znajdz_katy(final_coord.x, final_coord.z, final_coord.y, alpha, beta, gamma); // calculating angles
+                alpha = int(alpha * 180 / PI); // translating angles
                 beta = int(beta * 180 / PI);
                 gamma = int(gamma * 180 / PI);
-                cout << "Koordynaty koncowe: " << final_coord.x << "  " << final_coord.y << "  " << final_coord.z << endl;
-                cout << "Katy koncowe: " << alpha << "  " << beta << "  " << gamma << endl;
+                //cout << "Koordynaty koncowe: " << final_coord.x << "  " << final_coord.y << "  " << final_coord.z << endl;
+                //cout << "Katy koncowe: " << alpha << "  " << beta << "  " << gamma << endl;
                 moving = true;
             }
             cout << "Katy koncowe: " << alpha << "  " << beta << "  " << gamma << endl;
@@ -162,7 +162,7 @@ int main(void)
                     part3.rotate("+", current_manipulator_cords);
                 }
             }
-            if (part1.rot_pos_1 == alpha and part2.rot_pos_2 == beta and part3.rot_pos_3 == gamma)
+            if (part1.rot_pos_1 == alpha and part2.rot_pos_2 == beta and part3.rot_pos_3 == gamma) //switching to default mode after reaching destination
             {
                 GUI.mode = 5;
                 moving = false;
