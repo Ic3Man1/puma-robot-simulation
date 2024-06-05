@@ -7,7 +7,7 @@ class GUI {
 	public:
 		GUI(int screenWidth, int screenHeight);
 		void DrawGUI(int screenWidth, int screenHeight, Vector3 cords);
-		void CheckIfButtonPressed();
+		void CheckIfButtonPressed(int &game_state);
 
 	private:
 		Rectangle guiRectangle, acceptRectangle, startRectangle, finishRectangle, executeRectangle, manualRectangle;
