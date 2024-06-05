@@ -58,6 +58,7 @@ int main(void)
     // Main game loop
     while (!WindowShouldClose())        // Detect window close button or ESC key
     {
+        static bool writing = false;
         float x = DEG2RAD * (part1.rot_pos_1), y = DEG2RAD * (part2.rot_pos_2), z = DEG2RAD * (part3.rot_pos_3);
         Vector3 current_manipulator_cords = { 1.85 * sin(x) * cos(y) - 2.55 * sin(x) * sin(y) * sin(z) + 2.55 * sin(x) * cos(y) * cos(z),
                                 5.5 - (2.75 + 1.85 * sin(y) + 2.55 * sin(y) * cos(z) + 2.55 * cos(y) * sin(z)),
@@ -89,32 +90,34 @@ int main(void)
         DrawSphere({ 0, 0, 3 }, 0.5f, RED);
         DrawSphere({ 0, 0, -3 }, 0.5f, BLUE);
         rlPushMatrix();
+        if (!writing)
+        {
+            if (IsKeyDown(KEY_ONE))
+            {
+                part1.rotate("+", current_manipulator_cords);
+            }
+            else if (IsKeyDown(KEY_TWO))
+            {
+                part1.rotate("-", current_manipulator_cords);
+            }
 
-        if (IsKeyDown(KEY_ONE))
-        {
-            part1.rotate("+", current_manipulator_cords);
-        }
-        else if (IsKeyDown(KEY_TWO))
-        {
-            part1.rotate("-", current_manipulator_cords);
-        }
+            if (IsKeyDown(KEY_THREE))
+            {
+                part2.rotate("+", current_manipulator_cords);
+            }
+            else if (IsKeyDown(KEY_FOUR))
+            {
+                part2.rotate("-", current_manipulator_cords);
+            }
 
-        if (IsKeyDown(KEY_THREE))
-        {
-            part2.rotate("+", current_manipulator_cords);
-        }
-        else if (IsKeyDown(KEY_FOUR))
-        {
-            part2.rotate("-", current_manipulator_cords);
-        }
-
-        if (IsKeyDown(KEY_FIVE))
-        {
-            part3.rotate("+", current_manipulator_cords);
-        }
-        else if (IsKeyDown(KEY_SIX))
-        {
-            part3.rotate("-", current_manipulator_cords);
+            if (IsKeyDown(KEY_FIVE))
+            {
+                part3.rotate("+", current_manipulator_cords);
+            }
+            else if (IsKeyDown(KEY_SIX))
+            {
+                part3.rotate("-", current_manipulator_cords);
+            }
         }
      
 
@@ -137,7 +140,7 @@ int main(void)
         
         
         GUI.DrawGUI(screen_width, screen_height, current_manipulator_cords);
-        GUI.CheckIfMouseOnButton();
+        GUI.CheckIfMouseOnButton(writing);
         EndDrawing();
     }
 

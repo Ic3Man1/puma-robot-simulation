@@ -10,7 +10,7 @@ class GUI {
 		GUI(int screenWidth, int screenHeight);
 		void DrawGUI(int screenWidth, int screenHeight, Vector3 cords);
 		void CheckIfButtonPressed();
-		void CheckIfMouseOnButton();
+		void CheckIfMouseOnButton(bool &writing);
 
 	private:
 		Rectangle guiRectangle, acceptRectangle, startRectangle, finishRectangle, executeRectangle, manualRectangle, xRectangle, yRectangle, zRectangle;

@@ -90,11 +90,12 @@ void GUI::CheckIfButtonPressed() {
     }
 }
 
-void GUI::CheckIfMouseOnButton()
+void GUI::CheckIfMouseOnButton(bool &writing)
 {   
     //const int MAX_INPUT = 2;
     static int letter_count_x = 0, letter_count_y = 0, letter_count_z=0;
     if (CheckCollisionPointRec(GetMousePosition(), xRectangle)) {
+        writing = true;
         DrawRectangleLines(xRectangle.x, xRectangle.y, xRectangle.width, xRectangle.height, BLUE);
         //cout << "on x" << endl;
         int key_x = GetCharPressed();
@@ -120,6 +121,7 @@ void GUI::CheckIfMouseOnButton()
         }
     }
     else if (CheckCollisionPointRec(GetMousePosition(), yRectangle)) {
+        writing = true;
         DrawRectangleLines(yRectangle.x, yRectangle.y, yRectangle.width, yRectangle.height, BLUE);
         //cout << "on y" << endl;
         int key_y = GetCharPressed();
@@ -145,6 +147,7 @@ void GUI::CheckIfMouseOnButton()
         }
     }
     else if (CheckCollisionPointRec(GetMousePosition(), zRectangle)) {
+        writing = true;
         DrawRectangleLines(zRectangle.x, zRectangle.y, zRectangle.width, zRectangle.height, BLUE);
         //cout << "on z" << endl;
         int key_z = GetCharPressed();
@@ -166,11 +169,12 @@ void GUI::CheckIfMouseOnButton()
         {
             letter_count_z--;
             if (letter_count_z < 0) letter_count_z = 0;
-            z_input[letter_count_x] = '\0';
+            z_input[letter_count_z] = '\0';
         }
     }
     else
     {
+        writing = false;
         SetMouseCursor(MOUSE_CURSOR_DEFAULT);
     }
 }
