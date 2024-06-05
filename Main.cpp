@@ -5,6 +5,8 @@
 
 #include "Robot_part.h"
 #include "GUI.h"
+#include "InverseKinematicsCalc.h"
+
 
 BoundingBox create_bounding_box(Vector3 position, Vector3 size);
 
@@ -58,15 +60,15 @@ int main(void)
     {
         float x = DEG2RAD * (part1.rot_pos_1), y = DEG2RAD * (part2.rot_pos_2), z = DEG2RAD * (part3.rot_pos_3);
         Vector3 current_manipulator_cords = { 1.85 * sin(x) * cos(y) - 2.55 * sin(x) * sin(y) * sin(z) + 2.55 * sin(x) * cos(y) * cos(z),
-                                2.75 + 1.85 * sin(y) + 2.55 * sin(y) * cos(z) + 2.55 * cos(y) * sin(z),
+                                5.5 - (2.75 + 1.85 * sin(y) + 2.55 * sin(y) * cos(z) + 2.55 * cos(y) * sin(z)),
                                 1.85 * cos(x) * cos(y) + 2.55 * cos(x) * cos(y) * cos(z) - 2.55 * cos(x) * sin(y) * sin(z) };
-        current_manipulator_cords.y = 5.5 - current_manipulator_cords.y;
-        //cout << current_manipulator_cords.x << "; " << current_manipulator_cords.y << "; " << current_manipulator_cords.z << "      ";
+        //current_manipulator_cords.y = 5.5 - current_manipulator_cords.y;
+        //cout << current_manipulator_cords.x << "; " << current_manipulator_cords.y << "; " << current_manipulator_cords.z << endl;
         //cout << part1.rot_pos_1 << "  " << part2.rot_pos_2 << "  " << part3.rot_pos_3 << "     " << endl;
 
-        //1.85 * sin(x) * cos(y) - 2.45 * sin(x) * sin(y) * sin(z) + 2.45 * sin(x) * cos(y) * cos(z); //x
-        //1.85 * cos(x) * cos(y) + 2.45 * cos(x) * cos(y) * cos(z) - 2.45 * cos(x) * sin(y) * sin(z); //y
-        //2.75 + 1.85 * sin(y) + 2.45 * sin(y) * cos(z) + 2.45 * cos(y) * sin(z); // z
+        //a = 1.85 * sin(x) * cos(y) - 2.45 * sin(x) * sin(y) * sin(z) + 2.45 * sin(x) * cos(y) * cos(z); //x
+        //b = 1.85 * cos(x) * cos(y) + 2.45 * cos(x) * cos(y) * cos(z) - 2.45 * cos(x) * sin(y) * sin(z); //y
+        //c = 2.75 + 1.85 * sin(y) + 2.45 * sin(y) * cos(z) + 2.45 * cos(y) * sin(z); // z
         
         UpdateCamera(&camera, CAMERA_THIRD_PERSON);
 
@@ -75,16 +77,19 @@ int main(void)
             GUI.CheckIfButtonPressed();
         }
         
+        
         BeginDrawing();
-
+        
         ClearBackground(RAYWHITE);
         
         // Draw 3d
         BeginMode3D(camera);
-
+        DrawSphere({ 2, 0, 0 }, 0.5f, RED);
+        DrawSphere({ -2, 0, 0 }, 0.5f, BLUE);
+        DrawSphere({ 0, 0, 3 }, 0.5f, RED);
+        DrawSphere({ 0, 0, -3 }, 0.5f, BLUE);
         rlPushMatrix();
-        
-        
+
         if (IsKeyDown(KEY_ONE))
         {
             part1.rotate("+", current_manipulator_cords);
@@ -128,9 +133,11 @@ int main(void)
         EndMode3D();
         
         // Draw 2D
-      
-        GUI.DrawGUI(screen_width, screen_height, current_manipulator_cords);
 
+        
+        
+        GUI.DrawGUI(screen_width, screen_height, current_manipulator_cords);
+        GUI.CheckIfMouseOnButton();
         EndDrawing();
     }
 

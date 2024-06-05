@@ -43,11 +43,11 @@ void Robot_part::rotate(string side, Vector3 man_cords)
 		{
 			if (rot_pos_2 > -180 and rot_pos_2 < 180)
 			{
-				if (side == "+" and rot_pos_2 + 1 < 180 and (pow(man_cords.x, 2) + pow(man_cords.z, 2) + 1 > r or man_cords.y + 0.1 > 3))
+				if (side == "+" and rot_pos_2 + 1 < 180)
 				{
 					rot_pos_2++;
 				}
-				else if (side == "-" and rot_pos_2 - 1 > -180 and (pow(man_cords.x, 2) + pow(man_cords.z, 2) - 1 > r or man_cords.y - 0.1 > 3))
+				else if (side == "-" and rot_pos_2 - 1 > -180)
 				{
 					rot_pos_2--;
 				}
@@ -57,11 +57,11 @@ void Robot_part::rotate(string side, Vector3 man_cords)
 		{
 			if (rot_pos_3 > -180 and rot_pos_3 < 180)
 			{
-				if (side == "+" and rot_pos_3 + 1 < 180 and (pow(man_cords.x, 2) + pow(man_cords.z, 2) + 1 > r or man_cords.y + 0.1 > 3))
+				if (side == "+" and rot_pos_3 + 1 < 180)
 				{
 					rot_pos_3++;
 				}
-				else if (side == "-" and rot_pos_3 - 1 > -180 and (pow(man_cords.x, 2) + pow(man_cords.z, 2) - 1 > r or man_cords.y - 0.1 > 3))
+				else if (side == "-" and rot_pos_3 - 1 > -180)
 				{
 					rot_pos_3--;
 				}

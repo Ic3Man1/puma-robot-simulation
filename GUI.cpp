@@ -1,5 +1,6 @@
 #include "GUI.h"
 #include "Robot_part.h"
+#include <iostream>
 
 GUI::GUI(int screenWidth, int screenHeight) {
 	guiRectangle = { 0, (float)(screenHeight - screenHeight * 0.3), (float)(screenWidth), (float)(screenHeight * 0.3) };
@@ -8,6 +9,9 @@ GUI::GUI(int screenWidth, int screenHeight) {
     finishRectangle = { (float)(screenWidth / 5), (float)(screenHeight - screenHeight * 0.3 + 130),  (float)(screenWidth / 5), (float)(screenHeight * 0.1) };
     executeRectangle = { (float)(screenWidth / 2 - 120), (float)(screenHeight - screenHeight * 0.3 + 30),  (float)(screenWidth / 5 - 30), (float)(screenHeight * 0.1 + 100) };
     manualRectangle = { (float)(screenWidth / 5 * 3 + 30), (float)(screenHeight - screenHeight * 0.3 + 30),  (float)(screenWidth / 5), (float)(screenHeight * 0.07) };
+    xRectangle = { 40, (float)(screenHeight - screenHeight * 0.3 + 30),  (float)(screenWidth / 6)-30, (float)(screenHeight * 0.03) };
+    yRectangle = { 40, (float)(screenHeight - screenHeight * 0.3 + 62),  (float)(screenWidth / 6) - 30, (float)(screenHeight * 0.03) };
+    zRectangle = { 40, (float)(screenHeight - screenHeight * 0.3 + 100),  (float)(screenWidth / 6) - 30, (float)(screenHeight * 0.03) };
 
     guiColor = GRAY;
     buttonColor = DARKGRAY;
@@ -21,6 +25,13 @@ void GUI::DrawGUI(int screenWidth, int screenHeight, Vector3 cords) {
     DrawText("x: ", 20, screenHeight - screenHeight * 0.3 + 30, fontSize, BLACK);
     DrawText("y: ", 20, screenHeight - screenHeight * 0.3 + 60, fontSize, BLACK);
     DrawText("z: ", 20, screenHeight - screenHeight * 0.3 + 100, fontSize, BLACK);
+    //Drawing coordinates that will be set for robot to reach
+    DrawRectangleRec(xRectangle, LIGHTGRAY);
+    DrawText(x_input, xRectangle.x+3, xRectangle.y + 3, 20, BLACK);
+    DrawRectangleRec(yRectangle, LIGHTGRAY);
+    DrawText(y_input, yRectangle.x + 3, yRectangle.y + 3, 20, BLACK);
+    DrawRectangleRec(zRectangle, LIGHTGRAY);
+    DrawText(z_input, zRectangle.x + 3, zRectangle.y + 3, 20, BLACK);
 
     // drawing the accept button
     DrawRectangleRec(acceptRectangle, buttonColor);
@@ -76,5 +87,90 @@ void GUI::CheckIfButtonPressed() {
     if (CheckCollisionPointRec(GetMousePosition(), manualRectangle)) {
         // manual mode button callback function
 
+    }
+}
+
+void GUI::CheckIfMouseOnButton()
+{   
+    //const int MAX_INPUT = 2;
+    static int letter_count_x = 0, letter_count_y = 0, letter_count_z=0;
+    if (CheckCollisionPointRec(GetMousePosition(), xRectangle)) {
+        DrawRectangleLines(xRectangle.x, xRectangle.y, xRectangle.width, xRectangle.height, BLUE);
+        //cout << "on x" << endl;
+        int key_x = GetCharPressed();
+        SetMouseCursor(MOUSE_CURSOR_IBEAM);
+        while (key_x > 0)
+        {
+            // NOTE: Only allow keys in range [32..125]
+            if ((key_x >= 48) && (key_x <= 57) && (letter_count_x < 2))
+            {
+                x_input[letter_count_x] = (char)key_x;
+                x_input[letter_count_x + 1] = '\0';
+                letter_count_x++;
+            }
+
+            key_x = GetCharPressed();  // Check next character in the queue
+        }
+
+        if (IsKeyPressed(KEY_BACKSPACE))
+        {
+            letter_count_x--;
+            if (letter_count_x < 0) letter_count_x = 0;
+            x_input[letter_count_x] = '\0';
+        }
+    }
+    else if (CheckCollisionPointRec(GetMousePosition(), yRectangle)) {
+        DrawRectangleLines(yRectangle.x, yRectangle.y, yRectangle.width, yRectangle.height, BLUE);
+        //cout << "on y" << endl;
+        int key_y = GetCharPressed();
+        SetMouseCursor(MOUSE_CURSOR_IBEAM);
+        while (key_y > 0)
+        {
+            // NOTE: Only allow keys in range [32..125]
+            if ((key_y >= 48) && (key_y <= 57) && (letter_count_y < 2))
+            {
+                y_input[letter_count_y] = (char)key_y;
+                y_input[letter_count_y + 1] = '\0';
+                letter_count_y++;
+            }
+
+            key_y = GetCharPressed();  // Check next character in the queue
+        }
+
+        if (IsKeyPressed(KEY_BACKSPACE))
+        {
+            letter_count_y--;
+            if (letter_count_y < 0) letter_count_y = 0;
+            y_input[letter_count_y] = '\0';
+        }
+    }
+    else if (CheckCollisionPointRec(GetMousePosition(), zRectangle)) {
+        DrawRectangleLines(zRectangle.x, zRectangle.y, zRectangle.width, zRectangle.height, BLUE);
+        //cout << "on z" << endl;
+        int key_z = GetCharPressed();
+        SetMouseCursor(MOUSE_CURSOR_IBEAM);
+        while (key_z > 0)
+        {
+            // NOTE: Only allow keys in range [32..125]
+            if ((key_z >= 48) && (key_z <= 57) && (letter_count_z < 2))
+            {
+                z_input[letter_count_z] = (char)key_z;
+                z_input[letter_count_x + 1] = '\0';
+                letter_count_z++;
+            }
+
+            key_z = GetCharPressed();  // Check next character in the queue
+        }
+
+        if (IsKeyPressed(KEY_BACKSPACE))
+        {
+            letter_count_z--;
+            if (letter_count_z < 0) letter_count_z = 0;
+            z_input[letter_count_x] = '\0';
+        }
+    }
+    else
+    {
+        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
     }
 }
