@@ -138,6 +138,7 @@
     <ClCompile Include="Robot_part.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="stateNames.h" />
     <ClInclude Include="Robot_part.h" />
   </ItemGroup>
   <ItemGroup>

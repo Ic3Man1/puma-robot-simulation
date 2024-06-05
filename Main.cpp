@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+#include <tuple>
 
 #include "raylib.h"
 #include "rlgl.h"
@@ -6,6 +8,7 @@
 
 #include "Robot_part.h"
 #include "GUI.h"
+#include "stateNames.h"
 
 bool check_for_collision(int &rot_pos, char operation);
 
@@ -33,6 +36,8 @@ int main(void)
 
     InitWindow(screen_width, screen_height, "PUMA robot");
 
+    SetTargetFPS(60);
+
     // Define the camera to look into our 3d world
     Camera camera = { 0 };
     camera.position = { 10.0f, 10.0f, 10.0f }; // Camera position
@@ -49,7 +54,10 @@ int main(void)
     // Set up 2D GUI
     GUI GUI(screen_width, screen_height);
 
-    SetTargetFPS(60);                   // Set our game to run at 60 frames-per-second
+    // set up state machine mechanics
+    static int game_state = MANUAL;
+    
+    std::vector<std::tuple<int, int, int>> rotations;  // vector saving rot_1, rot_2 and rot_3 while learing
 
     // Main game loop
     while (!WindowShouldClose())        // Detect window close button or ESC key
@@ -65,14 +73,22 @@ int main(void)
                                         1.85 * cos(x) * cos(y),
                                         2.75 + 1.85 * sin(z) };
 
+        // Toggle camera controls
+        if (IsCursorHidden()) UpdateCamera(&camera, CAMERA_THIRD_PERSON);
 
-        UpdateCamera(&camera, CAMERA_THIRD_PERSON);
+        // Toggle camera controls
+        if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
+        {
+            if (IsCursorHidden()) EnableCursor();
+            else DisableCursor();
+        }
 
         // taking care of mouse inputs
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
-            GUI.CheckIfButtonPressed();
+            GUI.CheckIfButtonPressed(game_state);
         }
+        
         
         BeginDrawing();
 
@@ -81,51 +97,164 @@ int main(void)
         // Draw 3D
         BeginMode3D(camera);
 
-        rlPushMatrix();
-        
+        static int rotation = 0; // variable for going through the rotations vector while in EXECUTE state
+
         // taking care of keyboard inputs concerning robot movement
-        if (IsKeyDown(KEY_ONE) and check_for_collision(part1.rot_pos_1, '+'))
-        {
-            part1.rotate("+", current_manipulator_cords, current_rot_axis_coord);
-        }
-        else if (IsKeyDown(KEY_TWO) and check_for_collision(part1.rot_pos_1, '-'))
-        {
-            part1.rotate("-", current_manipulator_cords, current_rot_axis_coord);
-        }
+        switch (game_state) {
+            case MANUAL:
+                rlPushMatrix();
 
-        if (IsKeyDown(KEY_THREE) and check_for_collision(part2.rot_pos_2, '+'))
-        {
-            part2.rotate("+", current_manipulator_cords, current_rot_axis_coord);
-        }
-        else if (IsKeyDown(KEY_FOUR) and check_for_collision(part2.rot_pos_2, '-'))
-        {
-            part2.rotate("-", current_manipulator_cords, current_rot_axis_coord);
-        }
+                if (IsKeyDown(KEY_ONE) and check_for_collision(part1.rot_pos_1, '+'))
+                {
+                    part1.rotate("+", current_manipulator_cords, current_rot_axis_coord);
+                }
+                else if (IsKeyDown(KEY_TWO) and check_for_collision(part1.rot_pos_1, '-'))
+                {
+                    part1.rotate("-", current_manipulator_cords, current_rot_axis_coord);
+                }
 
-        if (IsKeyDown(KEY_FIVE) and check_for_collision(part3.rot_pos_3, '+'))
-        {
-            part3.rotate("+", current_manipulator_cords, current_rot_axis_coord);
+                if (IsKeyDown(KEY_THREE) and check_for_collision(part2.rot_pos_2, '+'))
+                {
+                    part2.rotate("+", current_manipulator_cords, current_rot_axis_coord);
+                }
+                else if (IsKeyDown(KEY_FOUR) and check_for_collision(part2.rot_pos_2, '-'))
+                {
+                    part2.rotate("-", current_manipulator_cords, current_rot_axis_coord);
+                }
+
+                if (IsKeyDown(KEY_FIVE) and check_for_collision(part3.rot_pos_3, '+'))
+                {
+                    part3.rotate("+", current_manipulator_cords, current_rot_axis_coord);
+                }
+                else if (IsKeyDown(KEY_SIX) and check_for_collision(part3.rot_pos_3, '-'))
+                {
+                    part3.rotate("-", current_manipulator_cords, current_rot_axis_coord);
+                }
+
+                // drawing robot parts
+                part1.draw();
+                part1.draw_wire(BLUE);
+                part2.draw();
+                part2.draw_wire(RED);
+                part3.draw();
+                part3.draw_wire(GREEN);
+                part4.draw();
+                part4.draw_wire(PURPLE);
+
+                rlPopMatrix();
+                DrawGrid(10, 1.0f);
+
+                break;
+
+            case LEARNING:
+
+                rlPushMatrix();
+                if (IsKeyDown(KEY_ONE) and check_for_collision(part1.rot_pos_1, '+'))
+                {
+                    part1.rotate("+", current_manipulator_cords, current_rot_axis_coord);
+                    rotations.push_back(std::make_tuple(part1.rot_pos_1, part2.rot_pos_2, part3.rot_pos_3));
+                }
+                else if (IsKeyDown(KEY_TWO) and check_for_collision(part1.rot_pos_1, '-'))
+                {
+                    part1.rotate("-", current_manipulator_cords, current_rot_axis_coord);
+                    rotations.push_back(std::make_tuple(part1.rot_pos_1, part2.rot_pos_2, part3.rot_pos_3));
+                }
+
+                if (IsKeyDown(KEY_THREE) and check_for_collision(part2.rot_pos_2, '+'))
+                {
+                    part2.rotate("+", current_manipulator_cords, current_rot_axis_coord);
+                    rotations.push_back(std::make_tuple(part1.rot_pos_1, part2.rot_pos_2, part3.rot_pos_3));
+                }
+                else if (IsKeyDown(KEY_FOUR) and check_for_collision(part2.rot_pos_2, '-'))
+                {
+                    part2.rotate("-", current_manipulator_cords, current_rot_axis_coord);
+                    rotations.push_back(std::make_tuple(part1.rot_pos_1, part2.rot_pos_2, part3.rot_pos_3));
+                }
+
+                if (IsKeyDown(KEY_FIVE) and check_for_collision(part3.rot_pos_3, '+'))
+                {
+                    part3.rotate("+", current_manipulator_cords, current_rot_axis_coord);
+                    rotations.push_back(std::make_tuple(part1.rot_pos_1, part2.rot_pos_2, part3.rot_pos_3));
+                }
+                else if (IsKeyDown(KEY_SIX) and check_for_collision(part3.rot_pos_3, '-'))
+                {
+                    part3.rotate("-", current_manipulator_cords, current_rot_axis_coord);
+                    rotations.push_back(std::make_tuple(part1.rot_pos_1, part2.rot_pos_2, part3.rot_pos_3));
+                }
+
+                // drawing robot parts
+                part1.draw();
+                part1.draw_wire(BLUE);
+                part2.draw();
+                part2.draw_wire(RED);
+                part3.draw();
+                part3.draw_wire(GREEN);
+                part4.draw();
+                part4.draw_wire(PURPLE);
+
+                rlPopMatrix();
+                DrawGrid(10, 1.0f);
+
+                break;
+
+            case FINISHED_LEARING:
+
+                rlPushMatrix();
+
+                part1.draw();
+                part1.draw_wire(BLUE);
+                part2.draw();
+                part2.draw_wire(RED);
+                part3.draw();
+                part3.draw_wire(GREEN);
+                part4.draw();
+                part4.draw_wire(PURPLE);
+
+                rlPopMatrix();
+                DrawGrid(10, 1.0f);
+
+                break;
+
+            case EXECUTE:
+
+                if (rotation < rotations.size()) {
+                    rlPushMatrix();
+
+                    part1.rot_pos_1 = std::get<0>(rotations[rotation]);
+                    part2.rot_pos_2 = std::get<1>(rotations[rotation]);
+                    part3.rot_pos_3 = std::get<2>(rotations[rotation]);
+
+                    part1.draw();
+                    part1.draw_wire(BLUE);
+                    part2.draw();
+                    part2.draw_wire(RED);
+                    part3.draw();
+                    part3.draw_wire(GREEN);
+                    part4.draw();
+                    part4.draw_wire(PURPLE);
+
+                    rlPopMatrix();
+                    DrawGrid(10, 1.0f); 
+
+                    rotation++;
+                }
+                else {
+                    game_state = MANUAL;
+                    rotations.clear();
+                    rotation = 0;
+                }
+
+                break;
+
+            case INVERSE:
+                break;
+
+            default:
+                break;
         }
-        else if (IsKeyDown(KEY_SIX) and check_for_collision(part3.rot_pos_3, '-'))
-        {
-            part3.rotate("-", current_manipulator_cords, current_rot_axis_coord);
-        }
-     
-        // drawing robot parts
-        part1.draw();
-        part1.draw_wire(BLUE);
-        part2.draw();
-        part2.draw_wire(RED);
-        part3.draw();
-        part3.draw_wire(GREEN);
-        part4.draw();
-        part4.draw_wire(PURPLE);
-        
-        rlPopMatrix();
-        DrawGrid(10, 1.0f);
 
         EndMode3D();
-        
+
         // Draw 2D
       
         GUI.DrawGUI(screen_width, screen_height, current_manipulator_cords);
@@ -137,6 +266,7 @@ int main(void)
 
     return 0;
 }
+
 
 bool check_for_collision(int &rot_pos, char operation) {
     // rotating to check if collision will happen
@@ -165,7 +295,6 @@ bool check_for_collision(int &rot_pos, char operation) {
     else {
         rot_pos++;
     }
-
 
     float r = 0.8 * sqrt(2) / 2 + 0.2;
 

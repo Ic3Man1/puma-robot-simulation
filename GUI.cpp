@@ -1,5 +1,6 @@
 #include "GUI.h"
 #include "Robot_part.h"
+#include "stateNames.h"
 
 GUI::GUI(int screenWidth, int screenHeight) {
 	guiRectangle = { 0, (float)(screenHeight - screenHeight * 0.3), (float)(screenWidth), (float)(screenHeight * 0.3) };
@@ -55,26 +56,34 @@ void GUI::DrawGUI(int screenWidth, int screenHeight, Vector3 cords) {
     DrawText(TextFormat("Z: %.2f", cords.y), screenWidth / 5 * 4 + 80, screenHeight - screenHeight * 0.3 + 180, fontSize, BLACK);
 }
 
-void GUI::CheckIfButtonPressed() {
+void GUI::CheckIfButtonPressed(int &game_state) {
     // checking if accept button was pressed
     if (CheckCollisionPointRec(GetMousePosition(), acceptRectangle)) {
         // accept button callback function
-   
+        if (game_state == MANUAL) {
+            game_state = INVERSE;
+        }
     }
     if (CheckCollisionPointRec(GetMousePosition(), startRectangle)) {
         // start learning button callback function
-
+        if (game_state == MANUAL) {
+            game_state = LEARNING;
+        }
     }
     if (CheckCollisionPointRec(GetMousePosition(), finishRectangle)) {
         // finish learing button callback function
-
+        if (game_state == LEARNING) {
+            game_state = FINISHED_LEARING;
+        }
     }
     if (CheckCollisionPointRec(GetMousePosition(), executeRectangle)) {
         // execute button callback function
-
+        if (game_state == FINISHED_LEARING) {
+            game_state = EXECUTE;
+        }
     }
     if (CheckCollisionPointRec(GetMousePosition(), manualRectangle)) {
         // manual mode button callback function
-
+        game_state = MANUAL;
     }
 }
