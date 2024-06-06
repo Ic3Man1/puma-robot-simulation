@@ -8,7 +8,6 @@
 #include "InverseKinematicsCalc.h"
 
 
-BoundingBox create_bounding_box(Vector3 position, Vector3 size);
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -126,10 +125,7 @@ int main(void)
             if (moving == false)
             {
                 final_coord = GUI.ReturnFinalCoordinates(); //geting destination
-                znajdz_katy(final_coord.x, final_coord.z, final_coord.y, alpha, beta, gamma); // calculating angles
-                alpha = int(alpha * 180 / PI); // translating angles
-                beta = int(beta * 180 / PI);
-                gamma = int(gamma * 180 / PI);
+                find_angles(final_coord.x, final_coord.z, final_coord.y, alpha, beta, gamma); // calculating angles
                 //cout << "Koordynaty koncowe: " << final_coord.x << "  " << final_coord.y << "  " << final_coord.z << endl;
                 //cout << "Katy koncowe: " << alpha << "  " << beta << "  " << gamma << endl;
                 moving = true;
@@ -195,11 +191,4 @@ int main(void)
     CloseWindow();       
 
     return 0;
-}
-
-BoundingBox create_bounding_box(Vector3 position, Vector3 size) 
-{
-    Vector3 min = { position.x - size.x / 2, position.y - size.y / 2, position.z - size.z / 2 };
-    Vector3 max = { position.x + size.x / 2, position.y + size.y / 2, position.z + size.z / 2 };
-    return {min, max};
 }
