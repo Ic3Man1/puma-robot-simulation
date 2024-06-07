@@ -187,10 +187,7 @@ int main(void)
                 break;
 
             case EXECUTE:
-
                 if (rotation < rotations.size()) {
-             
-
                     part1.rot_pos_1 = std::get<0>(rotations[rotation]);
                     part2.rot_pos_2 = std::get<1>(rotations[rotation]);
                     part3.rot_pos_3 = std::get<2>(rotations[rotation]);
@@ -270,7 +267,7 @@ int main(void)
 
         // Draw 2D
         
-        GUI.DrawGUI(screen_width, screen_height, current_manipulator_cords);
+        GUI.DrawGUI(screen_width, screen_height, current_manipulator_cords, game_state);
         GUI.CheckIfMouseOnButton(writing);
         EndDrawing();
     }

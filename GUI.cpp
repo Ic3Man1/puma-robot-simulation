@@ -19,10 +19,11 @@ GUI::GUI(int screenWidth, int screenHeight) {
     buttonColor = DARKGRAY;
 }
 
-void GUI::DrawGUI(int screenWidth, int screenHeight, Vector3 cords) {
+void GUI::DrawGUI(int screenWidth, int screenHeight, Vector3 cords, int game_state) {
     DrawRectangleRec(guiRectangle, guiColor);
 
     const unsigned int fontSize = 25;
+    Color button_pressed = BLUE;
 
     DrawText("x: ", 20, screenHeight - screenHeight * 0.3 + 30, fontSize, BLACK);
     DrawText("y: ", 20, screenHeight - screenHeight * 0.3 + 60, fontSize, BLACK);
@@ -39,22 +40,42 @@ void GUI::DrawGUI(int screenWidth, int screenHeight, Vector3 cords) {
     // drawing the accept button
     DrawRectangleRec(acceptRectangle, buttonColor);
     DrawText("ACCEPT", 30, screenHeight - screenHeight * 0.3 + 150, fontSize * 1.5, BLACK);
+    if (game_state == INVERSE)
+    {
+        DrawRectangleLines(acceptRectangle.x, acceptRectangle.y, acceptRectangle.width, acceptRectangle.height, button_pressed);
+    }
 
     // drawing the start learning button
     DrawRectangleRec(startRectangle, buttonColor);
     DrawText("Start learing", screenWidth / 4 - 40, screenHeight - screenHeight * 0.3 + 50, fontSize * 1.5, BLACK);
+    if (game_state == LEARNING)
+    {
+        DrawRectangleLines(startRectangle.x, startRectangle.y, startRectangle.width, startRectangle.height, button_pressed);
+    }
 
     // drawing the finish learning button
     DrawRectangleRec(finishRectangle, buttonColor);
     DrawText("Finish learing", screenWidth / 4 - 40, screenHeight - screenHeight * 0.3 + 150, fontSize * 1.5, BLACK);
+    if (game_state == FINISHED_LEARING)
+    {
+        DrawRectangleLines(finishRectangle.x, finishRectangle.y, finishRectangle.width, finishRectangle.height, button_pressed);
+    }
 
     // drawing the execute learing button
     DrawRectangleRec(executeRectangle, buttonColor);
     DrawText("Execute", screenWidth / 2 - 60, screenHeight - screenHeight * 0.3 + 110, fontSize * 1.5, BLACK);
+    if (game_state == EXECUTE)
+    {
+        DrawRectangleLines(executeRectangle.x, executeRectangle.y, executeRectangle.width, executeRectangle.height, button_pressed);
+    }
 
     // drawing the manual mode button
     DrawRectangleRec(manualRectangle, buttonColor);
     DrawText("Manual mode", screenWidth / 5 * 3 + 50, screenHeight - screenHeight * 0.3 + 40, fontSize * 1.5, BLACK);
+    if (game_state == MANUAL)
+    {
+        DrawRectangleLines(manualRectangle.x, manualRectangle.y, manualRectangle.width, manualRectangle.height, button_pressed);
+    }
 
     // drawing button info text
     DrawText("Button 1/2 - Axis 1", screenWidth / 5 * 3 + 50, screenHeight - screenHeight * 0.3 + 100, fontSize, BLACK);
