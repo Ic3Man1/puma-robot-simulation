@@ -140,6 +140,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InverseKinematicsCalc.h" />
+    <ClInclude Include="stateNames.h" />
     <ClInclude Include="Robot_part.h" />
   </ItemGroup>
   <ItemGroup>

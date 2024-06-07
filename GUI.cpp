@@ -1,5 +1,7 @@
 #include "GUI.h"
 #include "Robot_part.h"
+#include "stateNames.h"
+
 #include <iostream>
 
 GUI::GUI(int screenWidth, int screenHeight) {
@@ -67,41 +69,6 @@ void GUI::DrawGUI(int screenWidth, int screenHeight, Vector3 cords) {
     DrawText(TextFormat("Z: %.2f", cords.y), screenWidth / 5 * 4 + 80, screenHeight - screenHeight * 0.3 + 180, fontSize, BLACK);
 }
 
-int GUI::CheckIfButtonPressed() { // modes 
-    //pressing one button activates the mode assigned to him, functions returns information to main which mode it wants to use now
-    // 1 - inverse kinematics
-    // 2 - start learning
-    // 3 - finish learning
-    // 4 - execute learnt sequence
-    // 5 - manual mode (default)
-        
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) 
-    {
-        // checking if accept button was pressed
-        if (CheckCollisionPointRec(GetMousePosition(), acceptRectangle)) {
-            // accept button callback function
-            mode = 1;
-        }
-        if (CheckCollisionPointRec(GetMousePosition(), startRectangle)) {
-            // start learning button callback function
-            mode = 2;
-        }
-        if (CheckCollisionPointRec(GetMousePosition(), finishRectangle)) {
-            // finish learing button callback function
-            mode = 3;
-        }
-        if (CheckCollisionPointRec(GetMousePosition(), executeRectangle)) {
-            // execute button callback function
-            mode = 4;
-        }
-        if (CheckCollisionPointRec(GetMousePosition(), manualRectangle)) {
-            // manual mode button callback function
-            mode = 5;
-        }
-    }
-    return mode;
-}
-
 void GUI::CheckIfMouseOnButton(bool &writing)
 {   
     if (CheckCollisionPointRec(GetMousePosition(), xRectangle)) { // saves and displays input written by user
@@ -165,7 +132,7 @@ void GUI::CheckIfMouseOnButton(bool &writing)
         while (key_z > 0)
         {
             // NOTE: Only allow numbers
-            if ((((key_z >= 48) and (key_z <= 57)) or key_z == 46 or key_z == 45) and (letter_count_z < 5))
+            if ((((key_z >= 48) and (key_z <= 57)) or key_z == 46) and (letter_count_z < 5))
             {
                 z_input[letter_count_z] = (char)key_z;
                 z_input[letter_count_z + 1] = '\0';
@@ -195,6 +162,7 @@ Vector3 GUI::ReturnFinalCoordinates() // converts input given by user into float
     x = atof(x_input);
     y = atof(y_input);
     z = atof(z_input);
+  
     for (int i = 0; i <= 5; i++)
     {
         x_input[i] = '\0';
@@ -204,5 +172,38 @@ Vector3 GUI::ReturnFinalCoordinates() // converts input given by user into float
     letter_count_x = 0;
     letter_count_y = 0;
     letter_count_z = 0;
+  
     return {x,y,z};
+}
+
+void GUI::CheckIfButtonPressed(int &game_state) {
+    // checking if accept button was pressed
+    if (CheckCollisionPointRec(GetMousePosition(), acceptRectangle)) {
+        // accept button callback function
+        if (game_state == MANUAL) {
+            game_state = INVERSE;
+        }
+    }
+    if (CheckCollisionPointRec(GetMousePosition(), startRectangle)) {
+        // start learning button callback function
+        if (game_state == MANUAL) {
+            game_state = LEARNING;
+        }
+    }
+    if (CheckCollisionPointRec(GetMousePosition(), finishRectangle)) {
+        // finish learing button callback function
+        if (game_state == LEARNING) {
+            game_state = FINISHED_LEARING;
+        }
+    }
+    if (CheckCollisionPointRec(GetMousePosition(), executeRectangle)) {
+        // execute button callback function
+        if (game_state == FINISHED_LEARING) {
+            game_state = EXECUTE;
+        }
+    }
+    if (CheckCollisionPointRec(GetMousePosition(), manualRectangle)) {
+        // manual mode button callback function
+        game_state = MANUAL;
+    }
 }
