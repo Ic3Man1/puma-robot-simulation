@@ -184,7 +184,7 @@ Vector3 GUI::ReturnFinalCoordinates() // converts input given by user into float
     y = atof(y_input);
     z = atof(z_input);
 
-    if (x >= 0 and x <= 0.4 and z <= 3.5) x = 0.6;
+    if (x >= 0 and x <= 0.4 and z <= 3.5) x = 0.6;  //prevents user from inputting inappropriate coordinates
     if (x < 0 and x >= -0.4 and z <= 3.5) x = -0.6;
     if (y >= 0 and y <= 0.4 and z <= 3.5) y = 0.6;
     if (y < 0 and y >= -0.4 and z <= 3.5) y = -0.6;
