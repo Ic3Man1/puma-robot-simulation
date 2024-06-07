@@ -101,57 +101,51 @@ int main(void)
         BeginMode3D(camera);
 
         static int rotation = 0; // variable for going through the rotations vector while in EXECUTE state
+        static double alpha = 0, beta = 0, gamma = 0;
+        static bool moving = false;
+        static Vector3 final_coord = { 0,0,0 };
 
         // taking care of keyboard inputs concerning robot movement
         switch (game_state) {
             case MANUAL:
-                rlPushMatrix();
+                rotations.clear();
+                rotation = 0;
+                if (writing == false)
+                {
+                    if (IsKeyDown(KEY_ONE) and check_for_collision(part1.rot_pos_1, '+'))
+                    {
+                        part1.rotate("+", current_manipulator_cords, current_rot_axis_coord);
+                    }
+                    else if (IsKeyDown(KEY_TWO) and check_for_collision(part1.rot_pos_1, '-'))
+                    {
+                        part1.rotate("-", current_manipulator_cords, current_rot_axis_coord);
+                    }
 
-                if (IsKeyDown(KEY_ONE) and check_for_collision(part1.rot_pos_1, '+'))
-                {
-                    part1.rotate("+", current_manipulator_cords, current_rot_axis_coord);
-                }
-                else if (IsKeyDown(KEY_TWO) and check_for_collision(part1.rot_pos_1, '-'))
-                {
-                    part1.rotate("-", current_manipulator_cords, current_rot_axis_coord);
+                    if (IsKeyDown(KEY_THREE) and check_for_collision(part2.rot_pos_2, '+'))
+                    {
+                        part2.rotate("+", current_manipulator_cords, current_rot_axis_coord);
+                    }
+                    else if (IsKeyDown(KEY_FOUR) and check_for_collision(part2.rot_pos_2, '-'))
+                    {
+                        part2.rotate("-", current_manipulator_cords, current_rot_axis_coord);
+                    }
+
+                    if (IsKeyDown(KEY_FIVE) and check_for_collision(part3.rot_pos_3, '+'))
+                    {
+                        part3.rotate("+", current_manipulator_cords, current_rot_axis_coord);
+                    }
+                    else if (IsKeyDown(KEY_SIX) and check_for_collision(part3.rot_pos_3, '-'))
+                    {
+                        part3.rotate("-", current_manipulator_cords, current_rot_axis_coord);
+                    }
                 }
 
-                if (IsKeyDown(KEY_THREE) and check_for_collision(part2.rot_pos_2, '+'))
-                {
-                    part2.rotate("+", current_manipulator_cords, current_rot_axis_coord);
-                }
-                else if (IsKeyDown(KEY_FOUR) and check_for_collision(part2.rot_pos_2, '-'))
-                {
-                    part2.rotate("-", current_manipulator_cords, current_rot_axis_coord);
-                }
-
-                if (IsKeyDown(KEY_FIVE) and check_for_collision(part3.rot_pos_3, '+'))
-                {
-                    part3.rotate("+", current_manipulator_cords, current_rot_axis_coord);
-                }
-                else if (IsKeyDown(KEY_SIX) and check_for_collision(part3.rot_pos_3, '-'))
-                {
-                    part3.rotate("-", current_manipulator_cords, current_rot_axis_coord);
-                }
-
-                // drawing robot parts
-                part1.draw();
-                part1.draw_wire(BLUE);
-                part2.draw();
-                part2.draw_wire(RED);
-                part3.draw();
-                part3.draw_wire(GREEN);
-                part4.draw();
-                part4.draw_wire(PURPLE);
-
-                rlPopMatrix();
-                DrawGrid(10, 1.0f);
+               
 
                 break;
 
             case LEARNING:
 
-                rlPushMatrix();
                 if (IsKeyDown(KEY_ONE) and check_for_collision(part1.rot_pos_1, '+'))
                 {
                     part1.rotate("+", current_manipulator_cords, current_rot_axis_coord);
@@ -185,59 +179,21 @@ int main(void)
                     rotations.push_back(std::make_tuple(part1.rot_pos_1, part2.rot_pos_2, part3.rot_pos_3));
                 }
 
-                // drawing robot parts
-                part1.draw();
-                part1.draw_wire(BLUE);
-                part2.draw();
-                part2.draw_wire(RED);
-                part3.draw();
-                part3.draw_wire(GREEN);
-                part4.draw();
-                part4.draw_wire(PURPLE);
-
-                rlPopMatrix();
-                DrawGrid(10, 1.0f);
-
+                
                 break;
 
             case FINISHED_LEARING:
-
-                rlPushMatrix();
-
-                part1.draw();
-                part1.draw_wire(BLUE);
-                part2.draw();
-                part2.draw_wire(RED);
-                part3.draw();
-                part3.draw_wire(GREEN);
-                part4.draw();
-                part4.draw_wire(PURPLE);
-
-                rlPopMatrix();
-                DrawGrid(10, 1.0f);
 
                 break;
 
             case EXECUTE:
 
                 if (rotation < rotations.size()) {
-                    rlPushMatrix();
+             
 
                     part1.rot_pos_1 = std::get<0>(rotations[rotation]);
                     part2.rot_pos_2 = std::get<1>(rotations[rotation]);
                     part3.rot_pos_3 = std::get<2>(rotations[rotation]);
-
-                    part1.draw();
-                    part1.draw_wire(BLUE);
-                    part2.draw();
-                    part2.draw_wire(RED);
-                    part3.draw();
-                    part3.draw_wire(GREEN);
-                    part4.draw();
-                    part4.draw_wire(PURPLE);
-
-                    rlPopMatrix();
-                    DrawGrid(10, 1.0f); 
 
                     rotation++;
                 }
@@ -250,10 +206,7 @@ int main(void)
                 break;
 
             case INVERSE:
-            
-                static double alpha = 0, beta = 0, gamma = 0;
-                static bool moving = false;
-                static Vector3 final_coord = { 0,0,0 };
+
                 if (moving == false)
                 {
                     final_coord = GUI.ReturnFinalCoordinates(); //geting destination
@@ -267,27 +220,27 @@ int main(void)
                 {
                     if (part1.rot_pos_1 > alpha)
                     {
-                        part1.rotate("-", current_manipulator_cords);
+                        part1.rotate("-", current_manipulator_cords, current_rot_axis_coord);
                     }
                     else if (part1.rot_pos_1 < alpha)
                     {
-                        part1.rotate("+", current_manipulator_cords);
+                        part1.rotate("+", current_manipulator_cords, current_rot_axis_coord);
                     }
                     if (part2.rot_pos_2 > beta)
                     {
-                        part2.rotate("-", current_manipulator_cords);
+                        part2.rotate("-", current_manipulator_cords, current_rot_axis_coord);
                     }
                     else if (part2.rot_pos_2 < beta)
                     {
-                        part2.rotate("+", current_manipulator_cords);
+                        part2.rotate("+", current_manipulator_cords, current_rot_axis_coord);
                     }
                     if (part3.rot_pos_3 > gamma)
                     {
-                        part3.rotate("-", current_manipulator_cords);
+                        part3.rotate("-", current_manipulator_cords, current_rot_axis_coord);
                     }
                     else if (part3.rot_pos_3 < gamma)
                     {
-                        part3.rotate("+", current_manipulator_cords);
+                        part3.rotate("+", current_manipulator_cords, current_rot_axis_coord);
                     }
                 }
                 if (part1.rot_pos_1 == alpha and part2.rot_pos_2 == beta and part3.rot_pos_3 == gamma) //switching to default mode after reaching destination
@@ -300,7 +253,19 @@ int main(void)
             default:
                 break;
         }
+        rlPushMatrix();
 
+        part1.draw();
+        part1.draw_wire(BLUE);
+        part2.draw();
+        part2.draw_wire(RED);
+        part3.draw();
+        part3.draw_wire(GREEN);
+        part4.draw();
+        part4.draw_wire(PURPLE);
+
+        rlPopMatrix();
+        DrawGrid(10, 1.0f);
         EndMode3D();
 
         // Draw 2D
