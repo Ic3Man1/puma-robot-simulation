@@ -8,6 +8,7 @@
 
 #include "Robot_part.h"
 #include "GUI.h"
+#include "InverseKinematicsCalc.h"
 #include "stateNames.h"
 
 bool check_for_collision(int &rot_pos, char operation);
@@ -62,7 +63,10 @@ int main(void)
     // Main game loop
     while (!WindowShouldClose())        // Detect window close button or ESC key
     {
+        static bool writing = false;
+      
         // calculating current manipulator and rotational exis coordinates
+
         float x = DEG2RAD * (part1.rot_pos_1), y = DEG2RAD * (part2.rot_pos_2), z = DEG2RAD * (part3.rot_pos_3);
 
         Vector3 current_manipulator_cords = { 1.85 * sin(x) * cos(y) - 2.55 * sin(x) * sin(y) * sin(z) + 2.55 * sin(x) * cos(y) * cos(z),
@@ -89,9 +93,8 @@ int main(void)
             GUI.CheckIfButtonPressed(game_state);
         }
         
-        
         BeginDrawing();
-
+        
         ClearBackground(RAYWHITE);
         
         // Draw 3D
@@ -247,6 +250,51 @@ int main(void)
                 break;
 
             case INVERSE:
+            
+                static double alpha = 0, beta = 0, gamma = 0;
+                static bool moving = false;
+                static Vector3 final_coord = { 0,0,0 };
+                if (moving == false)
+                {
+                    final_coord = GUI.ReturnFinalCoordinates(); //geting destination
+                    find_angles(final_coord.x, final_coord.z, final_coord.y, alpha, beta, gamma); // calculating angles
+                    //cout << "Koordynaty koncowe: " << final_coord.x << "  " << final_coord.y << "  " << final_coord.z << endl;
+                    //cout << "Katy koncowe: " << alpha << "  " << beta << "  " << gamma << endl;
+                    moving = true;
+                }
+                cout << "Katy koncowe: " << alpha << "  " << beta << "  " << gamma << endl;
+                if (moving == true)
+                {
+                    if (part1.rot_pos_1 > alpha)
+                    {
+                        part1.rotate("-", current_manipulator_cords);
+                    }
+                    else if (part1.rot_pos_1 < alpha)
+                    {
+                        part1.rotate("+", current_manipulator_cords);
+                    }
+                    if (part2.rot_pos_2 > beta)
+                    {
+                        part2.rotate("-", current_manipulator_cords);
+                    }
+                    else if (part2.rot_pos_2 < beta)
+                    {
+                        part2.rotate("+", current_manipulator_cords);
+                    }
+                    if (part3.rot_pos_3 > gamma)
+                    {
+                        part3.rotate("-", current_manipulator_cords);
+                    }
+                    else if (part3.rot_pos_3 < gamma)
+                    {
+                        part3.rotate("+", current_manipulator_cords);
+                    }
+                }
+                if (part1.rot_pos_1 == alpha and part2.rot_pos_2 == beta and part3.rot_pos_3 == gamma) //switching to default mode after reaching destination
+                {
+                    game_state = MANUAL;
+                    moving = false;
+                }
                 break;
 
             default:
@@ -256,9 +304,9 @@ int main(void)
         EndMode3D();
 
         // Draw 2D
-      
+        
         GUI.DrawGUI(screen_width, screen_height, current_manipulator_cords);
-
+        GUI.CheckIfMouseOnButton(writing);
         EndDrawing();
     }
 
@@ -266,7 +314,6 @@ int main(void)
 
     return 0;
 }
-
 
 bool check_for_collision(int &rot_pos, char operation) {
     // rotating to check if collision will happen
@@ -305,3 +352,4 @@ bool check_for_collision(int &rot_pos, char operation) {
     
     return false;
 }
+
