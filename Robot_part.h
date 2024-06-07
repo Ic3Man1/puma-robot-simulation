@@ -9,7 +9,7 @@ using namespace std;
 
 class Robot_part {
 private:
-	int part_number, slices;
+	int part_number;
 	float length, height, width;
 	Color color;
 public:
