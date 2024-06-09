@@ -10,8 +10,10 @@
 #include "GUI.h"
 #include "InverseKinematicsCalc.h"
 #include "stateNames.h"
+#include "MovableSphere.h"
 
 bool check_for_collision(int &rot_pos, char operation);
+bool CheckIfSphereNearManipulator(MovableSphere sphere, Vector3 manipulator_coords);
 
 Vector3 cubePosition1 = { 0.0f, 1.5f, 0.0f };
 Vector3 cubePosition2 = { 0.65f, 2.75f, 0.85f };
@@ -27,6 +29,10 @@ Robot_part part1 = Robot_part(1, cubePosition1, 0.8f, 3.0f, 0.8f, GRAY);
 Robot_part part2 = Robot_part(2, cubePosition2, 0.5f, 0.5f, 2.5f, GRAY);
 Robot_part part3 = Robot_part(3, cubePosition3, 0.5f, 0.5f, 2.5f, GRAY);
 Robot_part part4 = Robot_part(4, cubePosition4, 0.3f, 0.3f, 0.3f, DARKGRAY);
+
+Vector3 sphere_postion_1 = { 0.0f, 0.5f, 2.0f };
+float sphere_radious_1 = 0.5f;
+MovableSphere sphere1(sphere_postion_1, sphere_radious_1);
 
 int main(void)
 {
@@ -55,18 +61,19 @@ int main(void)
     // Set up 2D GUI
     GUI GUI(screen_width, screen_height);
 
-    // set up state machine mechanics
-    static int game_state = MANUAL;
-    
-    std::vector<std::tuple<int, int, int>> rotations;  // vector saving rot_1, rot_2 and rot_3 while learing
-
     // Main game loop
     while (!WindowShouldClose())        // Detect window close button or ESC key
     {
+        // set up state machine mechanics
+        static int game_state = MANUAL;
+
+        // vector saving rot_1, rot_2, rot_3 and sphere postition while learing
+        static std::vector<std::tuple<int, int, int, Vector3>> rotations; 
+
         static bool writing = false;
+        static int execute_flag = 1;  // Keeps track if learnt movement should be executed
       
         // calculating current manipulator and rotational exis coordinates
-
         float x = DEG2RAD * (part1.rot_pos_1), y = DEG2RAD * (part2.rot_pos_2), z = DEG2RAD * (part3.rot_pos_3);
 
         Vector3 current_manipulator_cords = { 1.85 * sin(x) * cos(y) - 2.55 * sin(x) * sin(y) * sin(z) + 2.55 * sin(x) * cos(y) * cos(z),
@@ -90,7 +97,7 @@ int main(void)
         // taking care of mouse inputs
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
-            GUI.CheckIfButtonPressed(game_state);
+            GUI.CheckIfButtonPressed(game_state, execute_flag);
         }
         
         BeginDrawing();
@@ -99,11 +106,30 @@ int main(void)
         
         // Draw 3D
         BeginMode3D(camera);
-
+       
         static int rotation = 0; // variable for going through the rotations vector while in EXECUTE state
+        
+        // inverse kinematics flags
         static double alpha = 0, beta = 0, gamma = 0;
         static bool moving = false;
         static Vector3 final_coord = { 0,0,0 };
+
+        static bool follow_manipulator = false;  // if true the sphere should follow the manipulator
+
+        // if currently following the manipulator, pressing space will release the object
+        
+        if (follow_manipulator and IsKeyDown(KEY_ENTER)) {
+            follow_manipulator = false;
+        }
+
+        // if manipulator near the object and the space key is pressed, object will follow the manipulator
+        if (CheckIfSphereNearManipulator(sphere1, current_manipulator_cords) and IsKeyDown(KEY_SPACE)) {
+            follow_manipulator = true;
+        }
+
+        if (follow_manipulator) {
+            sphere1.FollowManipulator(current_manipulator_cords);
+        }
 
         // taking care of keyboard inputs concerning robot movement
         switch (game_state) {
@@ -140,46 +166,46 @@ int main(void)
                     }
                 }
 
-               
-
                 break;
 
             case LEARNING:
 
-                if (IsKeyDown(KEY_ONE) and check_for_collision(part1.rot_pos_1, '+'))
+                if (writing == false)
                 {
-                    part1.rotate("+", current_manipulator_cords, current_rot_axis_coord);
-                    rotations.push_back(std::make_tuple(part1.rot_pos_1, part2.rot_pos_2, part3.rot_pos_3));
-                }
-                else if (IsKeyDown(KEY_TWO) and check_for_collision(part1.rot_pos_1, '-'))
-                {
-                    part1.rotate("-", current_manipulator_cords, current_rot_axis_coord);
-                    rotations.push_back(std::make_tuple(part1.rot_pos_1, part2.rot_pos_2, part3.rot_pos_3));
+                    if (IsKeyDown(KEY_ONE) and check_for_collision(part1.rot_pos_1, '+'))
+                    {
+                        part1.rotate("+", current_manipulator_cords, current_rot_axis_coord);
+                        rotations.push_back(std::make_tuple(part1.rot_pos_1, part2.rot_pos_2, part3.rot_pos_3, sphere1.postion));
+                    }
+                    else if (IsKeyDown(KEY_TWO) and check_for_collision(part1.rot_pos_1, '-'))
+                    {
+                        part1.rotate("-", current_manipulator_cords, current_rot_axis_coord);
+                        rotations.push_back(std::make_tuple(part1.rot_pos_1, part2.rot_pos_2, part3.rot_pos_3, sphere1.postion));
+                    }
+
+                    if (IsKeyDown(KEY_THREE) and check_for_collision(part2.rot_pos_2, '+'))
+                    {
+                        part2.rotate("+", current_manipulator_cords, current_rot_axis_coord);
+                        rotations.push_back(std::make_tuple(part1.rot_pos_1, part2.rot_pos_2, part3.rot_pos_3, sphere1.postion));
+                    }
+                    else if (IsKeyDown(KEY_FOUR) and check_for_collision(part2.rot_pos_2, '-'))
+                    {
+                        part2.rotate("-", current_manipulator_cords, current_rot_axis_coord);
+                        rotations.push_back(std::make_tuple(part1.rot_pos_1, part2.rot_pos_2, part3.rot_pos_3, sphere1.postion));
+                    }
+
+                    if (IsKeyDown(KEY_FIVE) and check_for_collision(part3.rot_pos_3, '+'))
+                    {
+                        part3.rotate("+", current_manipulator_cords, current_rot_axis_coord);
+                        rotations.push_back(std::make_tuple(part1.rot_pos_1, part2.rot_pos_2, part3.rot_pos_3, sphere1.postion));
+                    }
+                    else if (IsKeyDown(KEY_SIX) and check_for_collision(part3.rot_pos_3, '-'))
+                    {
+                        part3.rotate("-", current_manipulator_cords, current_rot_axis_coord);
+                        rotations.push_back(std::make_tuple(part1.rot_pos_1, part2.rot_pos_2, part3.rot_pos_3, sphere1.postion));
+                    }
                 }
 
-                if (IsKeyDown(KEY_THREE) and check_for_collision(part2.rot_pos_2, '+'))
-                {
-                    part2.rotate("+", current_manipulator_cords, current_rot_axis_coord);
-                    rotations.push_back(std::make_tuple(part1.rot_pos_1, part2.rot_pos_2, part3.rot_pos_3));
-                }
-                else if (IsKeyDown(KEY_FOUR) and check_for_collision(part2.rot_pos_2, '-'))
-                {
-                    part2.rotate("-", current_manipulator_cords, current_rot_axis_coord);
-                    rotations.push_back(std::make_tuple(part1.rot_pos_1, part2.rot_pos_2, part3.rot_pos_3));
-                }
-
-                if (IsKeyDown(KEY_FIVE) and check_for_collision(part3.rot_pos_3, '+'))
-                {
-                    part3.rotate("+", current_manipulator_cords, current_rot_axis_coord);
-                    rotations.push_back(std::make_tuple(part1.rot_pos_1, part2.rot_pos_2, part3.rot_pos_3));
-                }
-                else if (IsKeyDown(KEY_SIX) and check_for_collision(part3.rot_pos_3, '-'))
-                {
-                    part3.rotate("-", current_manipulator_cords, current_rot_axis_coord);
-                    rotations.push_back(std::make_tuple(part1.rot_pos_1, part2.rot_pos_2, part3.rot_pos_3));
-                }
-
-                
                 break;
 
             case FINISHED_LEARING:
@@ -187,16 +213,16 @@ int main(void)
                 break;
 
             case EXECUTE:
-                if (rotation < rotations.size()) {
+                if (rotation < rotations.size() and execute_flag == 1) {
                     part1.rot_pos_1 = std::get<0>(rotations[rotation]);
                     part2.rot_pos_2 = std::get<1>(rotations[rotation]);
                     part3.rot_pos_3 = std::get<2>(rotations[rotation]);
+                    sphere1.postion = std::get<3>(rotations[rotation]);
 
                     rotation++;
                 }
                 else {
-                    game_state = MANUAL;
-                    rotations.clear();
+                    execute_flag = 0;
                     rotation = 0;
                 }
 
@@ -208,8 +234,6 @@ int main(void)
                 {
                     final_coord = GUI.ReturnFinalCoordinates(); //geting destination
                     find_angles(final_coord.x, final_coord.z, final_coord.y, alpha, beta, gamma); // calculating angles
-                    //cout << "Koordynaty koncowe: " << final_coord.x << "  " << final_coord.y << "  " << final_coord.z << endl;
-                    //cout << "Katy koncowe: " << alpha << "  " << beta << "  " << gamma << endl;
                     moving = true;
                 }
                 cout << "Katy koncowe: " << alpha << "  " << beta << "  " << gamma << endl;
@@ -250,6 +274,7 @@ int main(void)
             default:
                 break;
         }
+
         rlPushMatrix();
 
         part1.draw();
@@ -262,6 +287,9 @@ int main(void)
         part4.draw_wire(PURPLE);
 
         rlPopMatrix();
+
+        sphere1.Draw();
+
         DrawGrid(10, 1.0f);
         EndMode3D();
 
@@ -312,6 +340,14 @@ bool check_for_collision(int &rot_pos, char operation) {
         return true;
     }
     
+    return false;
+}
+
+bool CheckIfSphereNearManipulator(MovableSphere sphere, Vector3 manipulator_coords) {
+    float radius_multiplier = 1.0;
+    if (abs(sphere.postion.x - manipulator_coords.x) <= sphere.radious * radius_multiplier and abs(sphere.postion.y - manipulator_coords.y) <= sphere.radious * radius_multiplier and abs(sphere.postion.z - manipulator_coords.z) <= sphere.radious * radius_multiplier) {
+        return true;
+    }
     return false;
 }
 

@@ -11,7 +11,7 @@ class GUI {
 		void DrawGUI(int screenWidth, int screenHeight, Vector3 cords, int game_state);
 		void CheckIfMouseOnButton(bool& writing);
 		Vector3 ReturnFinalCoordinates();
-		void CheckIfButtonPressed(int &game_state);
+		void CheckIfButtonPressed(int &game_state, int &execute_flag);
 
 	private:
 		Rectangle guiRectangle, acceptRectangle, startRectangle, finishRectangle, executeRectangle, manualRectangle, xRectangle, yRectangle, zRectangle;

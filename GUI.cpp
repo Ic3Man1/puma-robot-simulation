@@ -39,7 +39,7 @@ void GUI::DrawGUI(int screenWidth, int screenHeight, Vector3 cords, int game_sta
 
     // drawing the accept button
     DrawRectangleRec(acceptRectangle, buttonColor);
-    DrawText("ACCEPT", 30, screenHeight - screenHeight * 0.3 + 150, fontSize * 1.5, BLACK);
+    DrawText("ACCEPT", 60, screenHeight - screenHeight * 0.3 + 150, fontSize * 1.5, BLACK);
     if (game_state == INVERSE)
     {
         DrawRectangleLines(acceptRectangle.x, acceptRectangle.y, acceptRectangle.width, acceptRectangle.height, button_pressed);
@@ -71,20 +71,23 @@ void GUI::DrawGUI(int screenWidth, int screenHeight, Vector3 cords, int game_sta
 
     // drawing the manual mode button
     DrawRectangleRec(manualRectangle, buttonColor);
-    DrawText("Manual mode", screenWidth / 5 * 3 + 50, screenHeight - screenHeight * 0.3 + 40, fontSize * 1.5, BLACK);
+    DrawText("Manual mode", screenWidth / 5 * 3 + 70, screenHeight - screenHeight * 0.3 + 40, fontSize * 1.5, BLACK);
     if (game_state == MANUAL)
     {
         DrawRectangleLines(manualRectangle.x, manualRectangle.y, manualRectangle.width, manualRectangle.height, button_pressed);
     }
 
     // drawing button info text
-    DrawText("Button 1/2 - Axis 1", screenWidth / 5 * 3 + 50, screenHeight - screenHeight * 0.3 + 100, fontSize, BLACK);
-    DrawText("Button 1/2 - Axis 2", screenWidth / 5 * 3 + 50, screenHeight - screenHeight * 0.3 + 140, fontSize, BLACK);
-    DrawText("Button 1/2 - Axis 3", screenWidth / 5 * 3 + 50, screenHeight - screenHeight * 0.3 + 180, fontSize, BLACK);
+    float font_size_multiplier = 0.8;
+    DrawText("Button 1/2 - Axis 1", screenWidth / 5 * 3 + 50, screenHeight - screenHeight * 0.3 + 100, fontSize * font_size_multiplier, BLACK);
+    DrawText("Button 3/4 - Axis 2", screenWidth / 5 * 3 + 50, screenHeight - screenHeight * 0.3 + 125, fontSize * font_size_multiplier, BLACK);
+    DrawText("Button 5/6 - Axis 3", screenWidth / 5 * 3 + 50, screenHeight - screenHeight * 0.3 + 150, fontSize * font_size_multiplier, BLACK);
+    DrawText("Space/Enter -", screenWidth / 5 * 3 + 50, screenHeight - screenHeight * 0.3 + 180, fontSize * font_size_multiplier, BLACK);
+    DrawText("Pick Up/Put Down", screenWidth / 5 * 3 + 50, screenHeight - screenHeight * 0.3 + 200, fontSize * font_size_multiplier, BLACK);
 
     // drawing manipulator coordinates text
     DrawText("Manipulator", screenWidth / 5 * 4 + 80, screenHeight - screenHeight * 0.3 + 30, fontSize, BLACK);
-    DrawText("coordinates:", screenWidth / 5 * 4 + 80, screenHeight - screenHeight * 0.3 + 70, fontSize, BLACK);
+    DrawText("coordinates:", screenWidth / 5 * 4 + 80, screenHeight - screenHeight * 0.3 + 60, fontSize, BLACK);
     DrawText(TextFormat("X: %.2f", cords.x), screenWidth / 5 * 4 + 80, screenHeight - screenHeight * 0.3 + 110, fontSize, BLACK);
     DrawText(TextFormat("Y: %.2f", cords.z), screenWidth / 5 * 4 + 80, screenHeight - screenHeight * 0.3 + 150, fontSize, BLACK);
     DrawText(TextFormat("Z: %.2f", cords.y), screenWidth / 5 * 4 + 80, screenHeight - screenHeight * 0.3 + 180, fontSize, BLACK);
@@ -203,7 +206,7 @@ Vector3 GUI::ReturnFinalCoordinates() // converts input given by user into float
     return {x,y,z};
 }
 
-void GUI::CheckIfButtonPressed(int &game_state) {
+void GUI::CheckIfButtonPressed(int &game_state, int &execute_flag) {
     // checking if accept button was pressed
     if (CheckCollisionPointRec(GetMousePosition(), acceptRectangle)) {
         // accept button callback function
@@ -225,12 +228,14 @@ void GUI::CheckIfButtonPressed(int &game_state) {
     }
     if (CheckCollisionPointRec(GetMousePosition(), executeRectangle)) {
         // execute button callback function
-        if (game_state == FINISHED_LEARING) {
+        if (game_state == FINISHED_LEARING or game_state == EXECUTE) {
             game_state = EXECUTE;
+            execute_flag = 1;
         }
     }
     if (CheckCollisionPointRec(GetMousePosition(), manualRectangle)) {
         // manual mode button callback function
         game_state = MANUAL;
+        execute_flag = 1;
     }
 }
