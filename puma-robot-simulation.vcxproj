@@ -137,11 +137,13 @@
     <ClCompile Include="InverseKinematicsCalc.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MovableSphere.cpp" />
+    <ClCompile Include="CoordinateServer.cpp" />
     <ClCompile Include="Robot_part.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InverseKinematicsCalc.h" />
     <ClInclude Include="MovableSphere.h" />
+    <ClInclude Include="CoordinateServer.h" />
     <ClInclude Include="stateNames.h" />
     <ClInclude Include="Robot_part.h" />
   </ItemGroup>

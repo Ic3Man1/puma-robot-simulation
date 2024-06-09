@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Send Coordinates</title>
+</head>
+<body>
+    <input type="text" id="x" placeholder="Enter X coordinate">
+    <input type="text" id="y" placeholder="Enter Y coordinate">
+    <input type="text" id="z" placeholder="Enter Z coordinate">
+    <button onclick="sendCoordinates()">Send</button>
+
+    <script>
+        function sendCoordinates() {
+            var x = parseFloat(document.getElementById('x').value);
+            var y = parseFloat(document.getElementById('y').value);
+            var z = parseFloat(document.getElementById('z').value);
+            fetch('http://localhost:5000/update_coordinates', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ x: x, y: y, z: z })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>

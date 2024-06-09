@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <tuple>
+#include <thread>
+#include <chrono>
 
 #include "raylib.h"
 #include "rlgl.h"
@@ -11,9 +13,12 @@
 #include "InverseKinematicsCalc.h"
 #include "stateNames.h"
 #include "MovableSphere.h"
+#include "CoordinateServer.h"
 
 bool check_for_collision(int &rot_pos, char operation);
 bool CheckIfSphereNearManipulator(MovableSphere sphere, Vector3 manipulator_coords);
+
+CoordinateServer server("65432");
 
 Vector3 cubePosition1 = { 0.0f, 1.5f, 0.0f };
 Vector3 cubePosition2 = { 0.65f, 2.75f, 0.85f };
@@ -45,6 +50,9 @@ int main(void)
 
     SetTargetFPS(60);
 
+    // Start the server for recieving coordinates
+    server.start();
+
     // Define the camera to look into our 3d world
     Camera camera = { 0 };
     camera.position = { 10.0f, 10.0f, 10.0f }; // Camera position
@@ -72,6 +80,11 @@ int main(void)
 
         static bool writing = false;
         static int execute_flag = 1;  // Keeps track if learnt movement should be executed
+
+        std::vector<float> coords = server.getCoordinates();
+        sphere1.postion.x = coords[0];
+        sphere1.postion.y = coords[1];
+        sphere1.postion.z = coords[2];
       
         // calculating current manipulator and rotational exis coordinates
         float x = DEG2RAD * (part1.rot_pos_1), y = DEG2RAD * (part2.rot_pos_2), z = DEG2RAD * (part3.rot_pos_3);
