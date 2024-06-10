@@ -236,7 +236,7 @@ int main(void)
                     find_angles(final_coord.x, final_coord.z, final_coord.y, alpha, beta, gamma); // calculating angles
                     moving = true;
                 }
-                cout << "Katy koncowe: " << alpha << "  " << beta << "  " << gamma << endl;
+                //cout << "Katy koncowe: " << alpha << "  " << beta << "  " << gamma << endl;
                 if (moving == true)
                 {
                     if (part1.rot_pos_1 > alpha)

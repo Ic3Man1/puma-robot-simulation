@@ -6,12 +6,10 @@
 using namespace Eigen;
 using namespace std;
 
-// Funkcja konwertuj¹ca stopnie na radiany
 double degrees_to_radians(double degrees) {
     return degrees * EIGEN_PI / 180.0;
 }
 
-// Funkcja ograniczaj¹ca k¹t do przedzia³u [-180, 180] stopni
 double normalize_angle(double angle_degrees) {
     while (angle_degrees > 180.0)
     {
@@ -24,7 +22,6 @@ double normalize_angle(double angle_degrees) {
     return angle_degrees;
 }
 
-// Funkcja obliczaj¹ca równania
 Vector3d equations(const Vector3d& angles, const Vector3d& xyz) {
     double alpha = degrees_to_radians(angles[0]);
     double beta = degrees_to_radians(angles[1]);
@@ -49,7 +46,6 @@ Vector3d equations(const Vector3d& angles, const Vector3d& xyz) {
     return F;
 }
 
-// Funkcja obliczaj¹ca jacobian równania
 Matrix3d jacobian(const Vector3d& angles) {
     double alpha = degrees_to_radians(angles[0]);
     double beta = degrees_to_radians(angles[1]);
@@ -78,26 +74,25 @@ Matrix3d jacobian(const Vector3d& angles) {
     return J;
 }
 
-void find_angles(float x, float y, float z, double& alpha, double& beta, double& gamma)
+void find_angles(float x, float y, float z, double& alpha, double& beta, double& gamma) // Newton-Raphson method
 {
-    // Dane wejœciowe x, y, z
-    Vector3d xyz(x, y, z); // Zamieñ na rzeczywiste wartoœci
+    // Input x, y, z
+    Vector3d xyz(x, y, z);
 
-    // Pocz¹tkowe przypuszczenia dla alpha, beta, gamma
+    // First guess at alpha, beta and gamma
     Vector3d angles(10.0, 10.0, 10.0);
 
     const double tolerance = 1e-6;
     const int max_iterations = 300;
 
     for (int i = 0; i < max_iterations; i++) {
-        Vector3d F = equations(angles, xyz);
-        Matrix3d J = jacobian(angles);
+        Vector3d F = equations(angles, xyz); // Set up equations
+        Matrix3d J = jacobian(angles); // Set up jacobian
 
         Vector3d delta = J.colPivHouseholderQr().solve(F);
         angles = angles + delta;
 
-        // Ograniczenie k¹tów do przedzia³u [-180, 180]
-        angles[0] = normalize_angle(angles[0]);
+        angles[0] = normalize_angle(angles[0]); // Limit amgles from -180 to 180 degrees
         angles[1] = normalize_angle(angles[1]);
         angles[2] = normalize_angle(angles[2]);
 
@@ -105,7 +100,7 @@ void find_angles(float x, float y, float z, double& alpha, double& beta, double&
             break;
         }
     }
-    alpha = int(angles[0]);
+    alpha = int(angles[0]);  // Convert final angles to int
     beta = int(angles[1]);
     gamma = int(angles[2]);
 }
