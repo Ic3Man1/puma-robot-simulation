@@ -94,7 +94,7 @@ int main(void)
             else DisableCursor();
         }
 
-        // taking care of mouse inputs
+        // Taking care of mouse inputs
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
             GUI.CheckIfButtonPressed(game_state, execute_flag);

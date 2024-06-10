@@ -47,7 +47,7 @@ void GUI::DrawGUI(int screenWidth, int screenHeight, Vector3 cords, int game_sta
 
     // drawing the start learning button
     DrawRectangleRec(startRectangle, buttonColor);
-    DrawText("Start learing", screenWidth / 4 - 40, screenHeight - screenHeight * 0.3 + 50, fontSize * 1.5, BLACK);
+    DrawText("Start learning", screenWidth / 4 - 55, screenHeight - screenHeight * 0.3 + 50, fontSize * 1.5, BLACK);
     if (game_state == LEARNING)
     {
         DrawRectangleLines(startRectangle.x, startRectangle.y, startRectangle.width, startRectangle.height, button_pressed);
@@ -55,7 +55,7 @@ void GUI::DrawGUI(int screenWidth, int screenHeight, Vector3 cords, int game_sta
 
     // drawing the finish learning button
     DrawRectangleRec(finishRectangle, buttonColor);
-    DrawText("Finish learing", screenWidth / 4 - 40, screenHeight - screenHeight * 0.3 + 150, fontSize * 1.5, BLACK);
+    DrawText("Finish learning", screenWidth / 4 - 55, screenHeight - screenHeight * 0.3 + 150, fontSize * 1.5, BLACK);
     if (game_state == FINISHED_LEARING)
     {
         DrawRectangleLines(finishRectangle.x, finishRectangle.y, finishRectangle.width, finishRectangle.height, button_pressed);
